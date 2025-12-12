@@ -1,9 +1,9 @@
-import { auth } from '$lib/auth';
+import { auth } from '$lib/server/auth';
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ request }) => {
+export const load = (async ({ locals }) => {
 
-    const session = await auth.api.getSession({ headers: request.headers });
+    const user = await locals.user;
     
-    return { session };
+    return { user };
 }) satisfies PageServerLoad;
