@@ -1,30 +1,91 @@
-import { auth } from "$lib/server/auth"; // path to your auth file
+import { sequence } from "@sveltejs/kit/hooks";
+import { redirect, type Handle } from "@sveltejs/kit";
+import { building } from '$app/environment';
+
 import { svelteKitHandler } from "better-auth/svelte-kit";
-import { building } from '$app/environment'
-import { redirect } from "@sveltejs/kit";
 
-export async function handle({ event, resolve }) {
+import { auth } from "$lib/server/auth"; 
+import { handleLoginRedirect } from "$lib/server/utils/login-redirect";
 
-    // Fetch current session from Better Auth
-    const session = await auth.api.getSession({
-        headers: event.request.headers,
-    });
 
-    // Make session and user available on server
-    if (session) {
-        event.locals.session = session.session;
-        event.locals.user = session.user;
-    } else {
-        delete event.locals.session;
-        delete event.locals.user;
-    }
+const AUTH_ROUTES = ["/login"];
 
-    console.log(event.locals.session, event.locals.user);
 
-    if (event.url.password.startsWith("/channels")) {
-        if (!event.locals.user || !event.locals.session) throw redirect(302, "/login");
-    }
-  
-    return svelteKitHandler({ event, resolve, auth, building });
-}
+const authSessionHook: Handle = async ({ event, resolve }) => {
+	// This sets cookies, headers, and internal auth state
+	return svelteKitHandler({ auth, event, resolve, building });
+};
 
+
+// *Session + locals hook  
+const sessionLocalsHook: Handle = async ({ event, resolve }) => {
+	const session = await auth.api.getSession({
+		headers: event.request.headers
+	});
+
+	if (session) {
+		event.locals.session = session.session;
+		event.locals.user = session.user;
+	} else {
+		delete event.locals.session;
+		delete event.locals.user;
+	}
+
+	return resolve(event);
+};
+
+
+// *Track the last visited page
+const lastPathHook: Handle = async ({ event, resolve }) => {
+	if (
+		!building &&                                                    // Cookies don’t exist during build                            
+		event.request.method === 'GET' &&                               // Only track page navigations
+		!AUTH_ROUTES.some((p) => event.url.pathname.startsWith(p))      // Avoid redirect loops
+	) {
+		event.cookies.set(
+			'disq.lastPath',
+			event.url.pathname + event.url.search,
+			{
+				path: '/',
+				httpOnly: true,
+				sameSite: 'lax',
+				secure: true,
+				maxAge: 60 * 10     // 10 minutes
+			}
+		);
+	}
+
+	return resolve(event);
+};
+
+
+// *Redirect logged-in users away from /login 
+const loginRedirectHook: Handle = async ({ event, resolve }) => {
+	if (event.locals.user && event.url.pathname === '/login') {
+		const lastPath = event.cookies.get('disq.lastPath') ?? '/channels';
+		throw redirect(302, lastPath);
+	}
+
+	return resolve(event);
+};
+
+
+// !Protected routes
+const protectedRoutesHook: Handle = async ({ event, resolve }) => {
+	if (event.url.pathname.startsWith('/channels')) {
+		if (!event.locals.user || !event.locals.session) {
+			throw redirect(302, handleLoginRedirect(event));
+		}
+	}
+
+	return resolve(event);
+};
+
+
+export const handle = sequence(
+    authSessionHook,                     // !Must be first
+    sessionLocalsHook,
+    lastPathHook,
+    loginRedirectHook,
+    protectedRoutesHook
+);

@@ -1,42 +1,49 @@
 <script lang="ts">
+	import { page } from "$app/state";
+	import type { HTMLAttributes } from "svelte/elements";
+
+	import { cn } from "$lib/utils.js";
+
 	import { authClient } from "$lib/auth-client";
+
 	import Button from "$lib/components/ui/button/button.svelte";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import FieldGroup from "$lib/components/ui/field/field-group.svelte";
 	import Field from "$lib/components/ui/field/field.svelte";
 	import FieldDescription from "$lib/components/ui/field/field-description.svelte";
 
-	import { cn } from "$lib/utils.js";
-	import type { HTMLAttributes } from "svelte/elements";
 
 	let { class: className, ...restProps }: HTMLAttributes<HTMLDivElement> = $props();
 
 	const id = $props.id();
 
+	const redirectTo = page.url.searchParams.get("redirectTo") ?? "/channels/@me";
+
+
 	async function loginWithGoogle() {
         await authClient.signIn.social({
             provider: "google",
-            callbackURL: "/",                   // /channels/@me
-            errorCallbackURL: "/error",         // /auth/error
-            newUserCallbackURL: "/",            // /channels/explore/servers  
+            callbackURL: redirectTo,                   
+            errorCallbackURL: "/error",         		// /auth/error
+            newUserCallbackURL: "/",            		// /channels/explore/servers  
         });
     }
 
 	async function loginWithGithub() {
 		await authClient.signIn.social({
 			provider: "github",
-			callbackURL: "/",                   // /channels/@me
-            errorCallbackURL: "/error",         // /auth/error
-            newUserCallbackURL: "/",            // /channels/explore/servers  
+			callbackURL: redirectTo,
+            errorCallbackURL: "/error",         		// /auth/error
+            newUserCallbackURL: "/",            		// /channels/explore/servers  
 		})
 	}
 
 	async function loginWithDiscord() {
 		await authClient.signIn.social({
 			provider: "discord",
-			callbackURL: "/",                   // /channels/@me
-            errorCallbackURL: "/error",         // /auth/error
-            newUserCallbackURL: "/",            // /channels/explore/servers  
+			callbackURL: redirectTo,                   
+            errorCallbackURL: "/error",         		// /auth/error
+            newUserCallbackURL: "/",            		// /channels/explore/servers  
 		})
 	}
 
