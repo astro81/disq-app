@@ -18,7 +18,7 @@ import {
 
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "$lib/server/db";
-import * as schema from "$lib/server/db/schema";
+import { user, session, account, verification } from "$lib/server/db/schema";
 
 import { betterAuth } from "better-auth";
 import { sveltekitCookies } from "better-auth/svelte-kit";
@@ -28,7 +28,7 @@ export const auth = betterAuth({
     secret: BETTER_AUTH_SECRET as string,
     database: drizzleAdapter(db, {
         provider: "pg",
-        schema
+        schema: { user, session, account, verification }
     }),
 
     emailAndPassword: { enabled: true },
@@ -72,7 +72,7 @@ export const auth = betterAuth({
         }
     },
 
-    user: { 
+    user: {                                                                 // *Update user id to uuid in db
         additionalFields: { 
             displayName: { type: "string", required: true, }, 
             profileBannerImage: { type: "string", required: false, } 

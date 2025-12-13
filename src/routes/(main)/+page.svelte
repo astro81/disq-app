@@ -1,8 +1,12 @@
 <script>
 	import { goto } from '$app/navigation';
-	import { authClient } from '$lib/auth-client.js';
-	import Button from '$lib/components/ui/button/button.svelte';
 
+	import { authClient } from '$lib/auth-client.js';
+
+	import Button from '$lib/components/ui/button/button.svelte';
+	import ModeToggleButton from '$lib/components/ui/button/ModeToggleButton.svelte';
+    
+    
     let { data } = $props();
 
 </script>
@@ -27,5 +31,8 @@
     >Logout</Button>
 
 {:else}
-    <a href="/login">Login</a>
+    <Button variant="default" href="/login">Login</Button>
 {/if}
+
+
+<ModeToggleButton />

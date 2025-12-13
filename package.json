@@ -66,6 +66,7 @@
 	},
 	"dependencies": {
 		"@neondatabase/serverless": "^1.0.2",
-		"better-auth": "^1.4.6"
+		"better-auth": "^1.4.6",
+		"mode-watcher": "^1.1.0"
 	}
 }
