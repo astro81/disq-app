@@ -1,11 +1,13 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { pgTable, text, timestamp, boolean, index, uuid } from "drizzle-orm/pg-core";
 
 import { channel, member, server } from "./server-schema";
 
 
 export const user = pgTable("user", {
-    id: uuid("id").defaultRandom().primaryKey(),
+    id: uuid("id")
+        .default(sql`pg_catalog.gen_random_uuid()`)
+        .primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
@@ -21,30 +23,34 @@ export const user = pgTable("user", {
 
 
 export const session = pgTable("session", {
-	id: text("id").primaryKey(),
-	expiresAt: timestamp("expires_at").notNull(),
-	token: text("token").notNull().unique(),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at")
-	  	.$onUpdate(() => /* @__PURE__ */ new Date())
-	  	.notNull(),
-	ipAddress: text("ip_address"),
-	userAgent: text("user_agent"),
-	userId: uuid("user_id")
-	  	.notNull()
-	  	.references(() => user.id, { onDelete: "cascade" }),
+    id: uuid("id")
+        .default(sql`pg_catalog.gen_random_uuid()`)
+        .primaryKey(),
+    expiresAt: timestamp("expires_at").notNull(),
+    token: text("token").notNull().unique(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+        .$onUpdate(() => /* @__PURE__ */ new Date())
+        .notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    userId: uuid("user_id")
+        .notNull()
+        .references(() => user.id, { onDelete: "cascade" }),
 }, (table) => [
-	index("session_userId_idx").on(table.userId)
+    index("session_userId_idx").on(table.userId)
 ]);
 
 
 export const account = pgTable("account", {
-    id: text("id").primaryKey(),
+    id: uuid("id")
+        .default(sql`pg_catalog.gen_random_uuid()`)
+        .primaryKey(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
     userId: uuid("user_id")
-      	.notNull()
-      	.references(() => user.id, { onDelete: "cascade" }),
+        .notNull()
+        .references(() => user.id, { onDelete: "cascade" }),
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
     idToken: text("id_token"),
@@ -54,25 +60,27 @@ export const account = pgTable("account", {
     password: text("password"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
-      	.$onUpdate(() => /* @__PURE__ */ new Date())
-      	.notNull(),
+        .$onUpdate(() => /* @__PURE__ */ new Date())
+        .notNull(),
 }, (table) => [
-	index("account_userId_idx").on(table.userId)
+    index("account_userId_idx").on(table.userId)
 ]);
 
 
 export const verification = pgTable("verification", {
-    id: text("id").primaryKey(),
+    id: uuid("id")
+        .default(sql`pg_catalog.gen_random_uuid()`)
+        .primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expires_at").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
-      	.defaultNow()
-      	.$onUpdate(() => /* @__PURE__ */ new Date())
-      	.notNull(),
+        .defaultNow()
+        .$onUpdate(() => /* @__PURE__ */ new Date())
+        .notNull(),
 }, (table) => [
-	index("verification_identifier_idx").on(table.identifier)
+    index("verification_identifier_idx").on(table.identifier)
 ]);
 
 

@@ -32,7 +32,7 @@
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
-	"vars": { "BETTER_AUTH_URL": "https://https://disq.disq-code.workers.dev/" }
+	"vars": { "BETTER_AUTH_URL": "https://disq.disq-code.workers.dev/" }
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/

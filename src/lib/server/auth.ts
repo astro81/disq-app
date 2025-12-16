@@ -79,6 +79,8 @@ export const auth = betterAuth({
         } 
     },
 
+    advanced: { database: { generateId: "uuid" } },
+
     plugins: [sveltekitCookies(getRequestEvent)], // make sure this is the last plugin in the array
 
 });
