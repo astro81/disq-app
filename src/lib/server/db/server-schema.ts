@@ -1,8 +1,10 @@
 import { index, pgTable, text, timestamp, uniqueIndex, uuid, varchar, integer, pgEnum } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm/relations";
 
-import { channelTypeEnum, memberRoleEnum } from "./enums";
 import { user } from "./auth-schema";
+
+export const memberRoleEnum = pgEnum("MemberRole", ["ADMIN", "MODERATOR", "GUEST"]);
+export const channelTypeEnum = pgEnum("ChannelType", ["TEXT", "VOICE", "VIDEO"]);
 
 
 export const server = pgTable("server", {
@@ -17,10 +19,13 @@ export const server = pgTable("server", {
 
     serverDescription: text("server_description"),
     
-    serverInviteCode: text("invite_code").notNull(),
+    serverInviteCode: text("invite_code").notNull().unique(),
 
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
 
     createdBy: uuid("created_by").notNull().references(() => user.id, {
         onDelete: 'cascade',
@@ -29,15 +34,6 @@ export const server = pgTable("server", {
 }, (table) => [
     index("server_creator_idx").on(table.createdBy),
 ]);
-
-export const serversRelations = relations(server, ({ one, many }) => ({
-    creator: one(user, {
-        fields: [server.createdBy],
-        references: [user.id],
-    }),
-    members: many(member),
-    channels: many(channel),
-}));
 
 
 export const member = pgTable("member", {
@@ -54,13 +50,69 @@ export const member = pgTable("member", {
     }),
 
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
 }, (table) => [
     index("members_profile_idx").on(table.userId),
     index("members_server_idx").on(table.serverId),
+    index("members_user_server_idx").on(table.userId, table.serverId),
     // A user can't join the same server twice
     uniqueIndex("members_unique_user_server").on(table.userId, table.serverId)
 ]);
+
+
+export const channel = pgTable("channel", {
+    channelId: uuid("channel_id").defaultRandom().primaryKey(),
+    channelName: varchar("channel_name", { length: 255 }).notNull(),
+    channelType: channelTypeEnum("type").default("TEXT").notNull(),
+
+    position: integer("position").notNull(),
+
+    createdBy: uuid("created_by").references(() => user.id, {
+        onDelete: "set null",
+    }),
+    serverId: uuid("server_id").notNull().references(() => server.serverId, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+    }),
+
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
+}, (table) => [
+    index("channels_created_by_idx").on(table.createdBy),
+    index("channels_server_idx").on(table.serverId),
+    index("channel_server_type_idx").on(table.serverId, table.channelType),
+    index("channels_position_idx").on(table.serverId, table.position),
+    uniqueIndex("channel_unique_name_per_server").on(table.serverId, table.channelName),
+]);
+
+export const channelsRelations = relations(channel, ({ one }) => ({
+    user: one(user, {
+        fields: [channel.createdBy],
+        references: [user.id],
+    }),
+    server: one(server, {
+        fields: [channel.serverId],
+        references: [server.serverId],
+    }),
+}));
+
+
+export const serversRelations = relations(server, ({ one, many }) => ({
+    creator: one(user, {
+        fields: [server.createdBy],
+        references: [user.id],
+        relationName: "server_creator",
+    }),
+    members: many(member),
+    channels: many(channel),
+}));
+
 
 export const membersRelations = relations(member, ({ one }) => ({
     user: one(user, {
@@ -74,46 +126,6 @@ export const membersRelations = relations(member, ({ one }) => ({
 }));
 
 
-export const channel = pgTable("channel", {
-    channelId: uuid("channel_id").defaultRandom().primaryKey(),
-    channelName: varchar("channel_name", { length: 255 }).notNull(),
-    channelType: channelTypeEnum("type").default("TEXT").notNull(),
-
-    position: integer("position").notNull(),
-
-    userId: uuid("user_id").notNull().references(() => user.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-    }),
-    serverId: uuid("server_id").notNull().references(() => server.serverId, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-    }),
-
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-}, (table) => [
-    index("channels_profile_idx").on(table.userId),
-    index("channels_server_idx").on(table.serverId),
-    index("channel_server_type_idx").on(table.serverId, table.channelType),
-    index("channels_position_idx").on(table.serverId, table.position), 
-    // Prevent duplicate channel name inside same server
-    uniqueIndex("channel_unique_name_per_server").on(table.serverId, table.channelName),
-]);
-
-export const channelsRelations = relations(channel, ({ one }) => ({
-    user: one(user, {
-        fields: [channel.userId],
-        references: [user.id],
-    }),
-    server: one(server, {
-        fields: [channel.serverId],
-        references: [server.serverId],
-    }),
-}));
-
-
-
-export type server = typeof server.$inferSelect;
-export type channel = typeof channel.$inferSelect;
-export type member = typeof member.$inferSelect;
+export type Server = typeof server.$inferSelect;
+export type Channel = typeof channel.$inferSelect;
+export type Member = typeof member.$inferSelect;

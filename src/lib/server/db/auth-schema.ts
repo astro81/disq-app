@@ -5,9 +5,7 @@ import { channel, member, server } from "./server-schema";
 
 
 export const user = pgTable("user", {
-    id: uuid("id")
-        .default(sql`pg_catalog.gen_random_uuid()`)
-        .primaryKey(),
+    id: uuid("id").defaultRandom().primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
     emailVerified: boolean("email_verified").default(false).notNull(),
@@ -23,9 +21,7 @@ export const user = pgTable("user", {
 
 
 export const session = pgTable("session", {
-    id: uuid("id")
-        .default(sql`pg_catalog.gen_random_uuid()`)
-        .primaryKey(),
+    id: uuid("id").defaultRandom().primaryKey(),
     expiresAt: timestamp("expires_at").notNull(),
     token: text("token").notNull().unique(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -43,9 +39,7 @@ export const session = pgTable("session", {
 
 
 export const account = pgTable("account", {
-    id: uuid("id")
-        .default(sql`pg_catalog.gen_random_uuid()`)
-        .primaryKey(),
+    id: uuid("id").defaultRandom().primaryKey(),
     accountId: text("account_id").notNull(),
     providerId: text("provider_id").notNull(),
     userId: uuid("user_id")
@@ -68,9 +62,7 @@ export const account = pgTable("account", {
 
 
 export const verification = pgTable("verification", {
-    id: uuid("id")
-        .default(sql`pg_catalog.gen_random_uuid()`)
-        .primaryKey(),
+    id: uuid("id").defaultRandom().primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expires_at").notNull(),
@@ -88,9 +80,12 @@ export const userRelations = relations(user, ({ many }) => ({
   	sessions: many(session),
   	accounts: many(account),
 
-	servers: many(server),
+    ownedServers: many(server, {
+        relationName: "server_creator",
+    }),
+
     members: many(member),
-    channels: many(channel),
+    createdChannels: many(channel),
 }));
 
 

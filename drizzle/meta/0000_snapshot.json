@@ -1,5 +1,5 @@
 {
-  "id": "bb50854f-ad94-4565-91fa-5e2eea3a35c9",
+  "id": "5a39a6f8-b758-445c-8b03-795a02c590a9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -13,7 +13,7 @@
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "default": "pg_catalog.gen_random_uuid()"
+          "default": "gen_random_uuid()"
         },
         "account_id": {
           "name": "account_id",
@@ -158,11 +158,11 @@
           "primaryKey": false,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
+        "created_by": {
+          "name": "created_by",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "server_id": {
           "name": "server_id",
@@ -186,11 +186,11 @@
         }
       },
       "indexes": {
-        "channels_profile_idx": {
-          "name": "channels_profile_idx",
+        "channels_created_by_idx": {
+          "name": "channels_created_by_idx",
           "columns": [
             {
-              "expression": "user_id",
+              "expression": "created_by",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -281,18 +281,18 @@
         }
       },
       "foreignKeys": {
-        "channel_user_id_user_id_fk": {
-          "name": "channel_user_id_user_id_fk",
+        "channel_created_by_user_id_fk": {
+          "name": "channel_created_by_user_id_fk",
           "tableFrom": "channel",
           "tableTo": "user",
           "columnsFrom": [
-            "user_id"
+            "created_by"
           ],
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
-          "onUpdate": "cascade"
+          "onDelete": "set null",
+          "onUpdate": "no action"
         },
         "channel_server_id_server_server_id_fk": {
           "name": "channel_server_id_server_server_id_fk",
@@ -379,6 +379,27 @@
         "members_server_idx": {
           "name": "members_server_idx",
           "columns": [
+            {
+              "expression": "server_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "members_user_server_idx": {
+          "name": "members_user_server_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
             {
               "expression": "server_id",
               "isExpression": false,
@@ -561,6 +582,13 @@
           "columns": [
             "server_name"
           ]
+        },
+        "server_invite_code_unique": {
+          "name": "server_invite_code_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "invite_code"
+          ]
         }
       },
       "policies": {},
@@ -576,7 +604,7 @@
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "default": "pg_catalog.gen_random_uuid()"
+          "default": "gen_random_uuid()"
         },
         "expires_at": {
           "name": "expires_at",
@@ -677,7 +705,7 @@
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "default": "pg_catalog.gen_random_uuid()"
+          "default": "gen_random_uuid()"
         },
         "name": {
           "name": "name",
@@ -756,7 +784,7 @@
           "type": "uuid",
           "primaryKey": true,
           "notNull": true,
-          "default": "pg_catalog.gen_random_uuid()"
+          "default": "gen_random_uuid()"
         },
         "identifier": {
           "name": "identifier",
@@ -816,26 +844,7 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {
-    "public.ChannelType": {
-      "name": "ChannelType",
-      "schema": "public",
-      "values": [
-        "TEXT",
-        "VOICE",
-        "VIDEO"
-      ]
-    },
-    "public.MemberRole": {
-      "name": "MemberRole",
-      "schema": "public",
-      "values": [
-        "ADMIN",
-        "MODERATOR",
-        "GUEST"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {},
   "sequences": {},
   "roles": {},
