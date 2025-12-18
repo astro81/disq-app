@@ -11,11 +11,8 @@ export const server = pgTable("server", {
     serverId: uuid("server_id").defaultRandom().primaryKey(),
     serverName: varchar("server_name", { length: 255 }).notNull().unique(),
 
-    serverImageUrl: text("server_image_url").notNull(), // secure_url (full CDN)
-    serverImagePublicId: text("server_image_public_id").notNull(), // public_id (for transformations)
-    
+    serverImageUrl: text("server_image_url").notNull(), // secure_url (full CDN)    
     serverBannerImageUrl: text("server_banner_image_url"),
-    serverBannerImagePublicId: text("server_banner_image_public_id"),
 
     serverDescription: text("server_description"),
     

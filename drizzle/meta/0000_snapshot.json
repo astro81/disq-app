@@ -1,5 +1,5 @@
 {
-  "id": "5a39a6f8-b758-445c-8b03-795a02c590a9",
+  "id": "330bfd9b-a1ed-45c1-9df7-85473f31600a",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -491,20 +491,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "server_image_public_id": {
-          "name": "server_image_public_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
         "server_banner_image_url": {
           "name": "server_banner_image_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "server_banner_image_public_id": {
-          "name": "server_banner_image_public_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
