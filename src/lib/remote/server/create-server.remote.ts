@@ -1,6 +1,5 @@
 import { form, getRequestEvent } from "$app/server";
 import { error, redirect } from "@sveltejs/kit";
-import { randomUUID } from "crypto";
 
 import { z } from "zod";
 
@@ -29,7 +28,7 @@ export const createServer = form(
         const user = requireAuth();
         if(!user) error(401, 'Unauthorized');
 
-        const inviteCode = randomUUID();
+        const inviteCode = crypto.randomUUID();
 
         // Insert server
         const [newServer] = await db.insert(server).values({
@@ -66,7 +65,7 @@ export const createServer = form(
         if (!newChannel) throw error(500, 'Failed to create default channel');
 
         // Redirect after successful transaction
-        redirect(303, `/channels/${newServer.serverId}`);
+        redirect(303, `/servers/${newServer.serverId}`);
 
     }
 

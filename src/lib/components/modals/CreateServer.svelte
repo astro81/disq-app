@@ -6,33 +6,24 @@
 
     import * as Field from "$lib/components/ui/field";
 
-    import { CircleAlert, X } from "@lucide/svelte";
+    import { CircleAlert, Plus } from "@lucide/svelte";
 
-	import { createUploader } from "$lib/utils/uploadthing";
-	import { UploadDropzone } from "@uploadthing/svelte";
+	import { browser } from "$app/environment";
+	import CreateServerImageUploader from "./CreateServerImageUploader.svelte";
 
 
     let isOpen = $state(false);
     let isLoading = $state(false);
     let imageUrl: string | null = $state(null);
-    let uploadError: string | null = null;
-
-
-    const uploader = createUploader("serverImage", {
-        onClientUploadComplete: (res) => {
-            imageUrl = res[0].ufsUrl;
-        },
-        onUploadError: (error: Error) => {
-            alert(`ERROR! ${error.message}`);
-        },
-    });
-
 
 </script>
  
-<Dialog.Root open>
+<Dialog.Root bind:open={isOpen}>
 
-    <Dialog.Trigger class={buttonVariants({ variant: "outline" })}>Open Dialog</Dialog.Trigger>
+    <Dialog.Trigger class="flex mx-3 h-[48px] w-[48px] rounded-[24px] group-hover:rounded-[16px] 
+            transition-all overflow-hidden items-center justify-center bg-background dark:bg-neutral-700 group-hover:bg-emerald-500">
+        <Plus class="group-hover:text-white transition text-emerald-500" size="25"/>
+    </Dialog.Trigger>
 
     <Dialog.Content class="sm:max-w-[425px]">
         <Dialog.Header>
@@ -78,28 +69,9 @@
                         </Field.Error>
                     </Field.Field>
 
-                    {#if imageUrl}
-                        <!-- Preview -->
-                        <div class="relative w-full mt-2">
-                            <img src={imageUrl} alt="Preview" class="h-60 w-full rounded object-cover" />
-                            <button
-                                type="button"
-                                onclick={() => imageUrl = null}
-                                class="absolute top-2 right-2 bg-gray-200 hover:bg-gray-300 rounded-full p-1 shadow"
-                                aria-label="Remove image"
-                            >
-                                <X class="w-4 h-4 text-gray-800"/>
-                            </button>
-                        </div>
-                    {:else}
-                        <!-- UploadThing Dropzone -->
-                        <UploadDropzone
-                            {uploader}
-                            multiple={false}
-                            class="border-dashed border-2 border-gray-400 p-6 rounded text-center cursor-pointer"
-                        >
-                            Drag & drop or click to upload server image
-                        </UploadDropzone>
+                    <!-- Uploader (CLIENT ONLY) -->
+                    {#if browser}
+                        <CreateServerImageUploader bind:imageUrl />
                     {/if}
 
                     <!-- Hidden input for form submission -->
