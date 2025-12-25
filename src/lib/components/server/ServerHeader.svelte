@@ -4,6 +4,7 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
 	import { ChevronDown, CirclePlus, LogOut, Settings, Trash, UserPlus, Users } from "@lucide/svelte";
+	import InviteMember from "$lib/components/modals/InviteMember.svelte";
 
     interface ServerHeaderProps {
         currentServer: ServerResponseProps,
@@ -13,6 +14,7 @@
     // todo: setup current server store
     let { currentServer, role }: ServerHeaderProps = $props();
     
+    let inviteDialogOpen = $state(false);
 
     const isAdmin = $derived(role === 'ADMIN');
     const isModerator = $derived(isAdmin || role === 'MODERATOR');
@@ -33,9 +35,9 @@
     <DropdownMenu.Content align="start" class="w-56 text-xs font-medium text-black dark:text-neutral-400 space-y-0.5">
         {#if isModerator}
             <DropdownMenu.Item 
-                onclick={() => {}}
-                class="text-indigo-600 dark:text-indigo-400 px-3 py-2 cursor-pointer">
-                Invite People
+                class="text-indigo-600 dark:text-indigo-400 px-3 py-2 cursor-pointer"
+                onclick={() => { inviteDialogOpen = true }}
+                >Invite People
                 <UserPlus class="size-4 ml-auto"/>
             </DropdownMenu.Item>
         {/if}
@@ -80,3 +82,5 @@
             
     </DropdownMenu.Content>
 </DropdownMenu.Root>
+
+<InviteMember bind:inviteDialogOpen={inviteDialogOpen} {currentServer}/>
