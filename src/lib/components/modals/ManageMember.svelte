@@ -17,6 +17,7 @@
 
 	import type { ServerMemberRole } from "$lib/types/server";
 	import { changeMemberRole } from "$lib/remote/server/change-role.remote";
+	import { kickServerMember } from "$lib/remote/server/kick-member.remote";
 
     let { isManageMemberDialogOpen = $bindable(), members } = $props();
 
@@ -29,6 +30,19 @@
             loadingId = memberId;
 
             await changeMemberRole({ memberId, role, serverId });
+        } catch (error) {
+            alert(error);
+        } finally {
+            loadingId = "";
+        }
+    }
+
+    const onKick = async (memberId: string, serverId: string) => {
+        try {
+            loadingId = memberId;
+
+            await kickServerMember({ memberId, serverId });
+
         } catch (error) {
             alert(error);
         } finally {
@@ -101,7 +115,7 @@
 
                                     <DropdownMenuSeparator />
 
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem onclick={() => onKick(member.memberId, currentServer?.serverId ?? "")}>
                                         <Gavel class="size-4"/>
                                         Kick
                                     </DropdownMenuItem>
