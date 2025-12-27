@@ -10,16 +10,29 @@ export interface ServerProps {
     createdBy: string;
 }
 
-export type ServerRole = 'ADMIN' | 'MODERATOR' | 'GUEST';
+export type ServerMemberRole = 'ADMIN' | 'MODERATOR' | 'GUEST';
 
 export interface ServerMemberProps {
     memberId: string;
-    role: ServerRole;
+    role: ServerMemberRole;
     userId: string;
     serverId: string;
     createdAt: Date;
     updatedAt: Date;
 }
+
+
+export type ServerMemberAllProps = {
+    memberId: string;
+    role: "ADMIN" | "MODERATOR" | "GUEST";
+    userId: string | null;
+    username: string | null;
+    userProfileImage: string | null;
+    userDisplayName: string | null;
+    userEmail: string | null;
+    joinedAt: Date;
+};
+
 
 export interface ServerResponseProps {
     server: ServerProps;

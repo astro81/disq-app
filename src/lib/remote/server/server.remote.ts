@@ -3,7 +3,7 @@ import { db } from "$lib/server/db";
 import { server, member, channel } from "$lib/server/db/server-schema";
 import { z } from "zod";
 import { and, eq } from "drizzle-orm";
-import { invalid, redirect } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
 import { user } from "$lib/server/db/auth-schema";
 
 
@@ -76,13 +76,16 @@ export const getAllServerChannels = query(z.object({ serverId: z.string() }), as
 })
 
 
-export const getAllServerMembers = query(z.object({ serverId: z.string() }), async ({ serverId }) => {
+export const getServerMembers = query(z.object({ serverId: z.string() }), async ({ serverId }) => {
     return await db
         .select({
             memberId: member.memberId,
             role: member.role,
             userId: user.id,
-            userName: user.name, 
+            username: user.name, 
+            userProfileImage: user.image,
+            userDisplayName: user.displayName,
+            userEmail: user.email,
             joinedAt: member.createdAt,
         })
         .from(member)

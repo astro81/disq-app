@@ -1,23 +1,29 @@
 <script lang="ts">
-	import type { ServerResponseProps, ServerRole } from "$lib/types/server";
+	import type { ServerMemberAllProps, ServerResponseProps, ServerMemberRole } from "$lib/types/server";
 
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
 	import { ChevronDown, CirclePlus, LogOut, Settings, Trash, UserPlus, Users } from "@lucide/svelte";
 	import InviteMember from "$lib/components/modals/InviteMember.svelte";
+	import ServerSettings from "$lib/components/modals/ServerSettings.svelte";
+	import ManageMember from "../modals/ManageMember.svelte";
 
+    
     interface ServerHeaderProps {
         currentServer: ServerResponseProps,
-        role: ServerRole
+        role: ServerMemberRole,
+        members: ServerMemberAllProps[]
     }
 
     // todo: setup current server store
-    let { currentServer, role }: ServerHeaderProps = $props();
+    let { currentServer, role, members }: ServerHeaderProps = $props();
     
-    let inviteDialogOpen = $state(false);
-
     const isAdmin = $derived(role === 'ADMIN');
     const isModerator = $derived(isAdmin || role === 'MODERATOR');
+
+    let inviteDialogOpen = $state(false);
+    let isServerEditDialogOpen = $state(false);
+    let isManageMemberDialogOpen = $state(false);
 </script>
 
  
@@ -43,14 +49,18 @@
         {/if}
         
         {#if isAdmin}
-            <DropdownMenu.Item class="px-3 py-2 cursor-pointer">
-                Server Settings
+            <DropdownMenu.Item 
+                class="px-3 py-2 cursor-pointer"
+                onclick={() => { isServerEditDialogOpen = true }}
+                >Server Settings
                 <Settings class="size-4 ml-auto"/>
             </DropdownMenu.Item>
         {/if}
         {#if isAdmin}
-            <DropdownMenu.Item class="px-3 py-2 cursor-pointer">
-                Manage Members
+            <DropdownMenu.Item 
+                class="px-3 py-2 cursor-pointer"
+                onclick={() => { isManageMemberDialogOpen = true }}
+                >Manage Members
                 <Users class="size-4 ml-auto"/>
             </DropdownMenu.Item>
         {/if}
@@ -83,4 +93,7 @@
     </DropdownMenu.Content>
 </DropdownMenu.Root>
 
+<!-- todo: pass the currentServer from the store -->
 <InviteMember bind:inviteDialogOpen={inviteDialogOpen} {currentServer}/>
+<ServerSettings bind:isServerEditDialogOpen={isServerEditDialogOpen} {currentServer}/>
+<ManageMember bind:isManageMemberDialogOpen={isManageMemberDialogOpen} {members}/>

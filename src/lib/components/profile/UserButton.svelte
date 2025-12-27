@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from "$app/navigation";
+	import { authClient } from "$lib/auth-client";
 	import { getUserState } from "$lib/stores/user-state.svelte";
 	import AvatarFallback from "../ui/avatar/avatar-fallback.svelte";
 	import AvatarImage from "../ui/avatar/avatar-image.svelte";
@@ -67,7 +69,16 @@
 
             <div class="mt-4 flex flex-col gap-2">
 				<Button variant="outline" class="w-full">Settings</Button>
-				<Button variant="destructive" class="w-full">Logout</Button>
+				<Button
+    			    variant="destructive"
+    			    onclick={async () => {
+    			        await authClient.signOut({
+    			            fetchOptions: {
+    			                onSuccess: () => { goto("/login"); }
+    			            }
+    			        })
+    			    }}
+    			>Logout</Button>
 			</div>
 		</DialogContent>
 	</Dialog>
