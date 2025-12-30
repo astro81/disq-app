@@ -7,6 +7,7 @@
 	import InviteMember from "$lib/components/modals/InviteMember.svelte";
 	import ServerSettings from "$lib/components/modals/ServerSettings.svelte";
 	import ManageMember from "../modals/ManageMember.svelte";
+	import CreateChannel from "../modals/CreateChannel.svelte";
 
     
     interface ServerHeaderProps {
@@ -24,6 +25,7 @@
     let inviteDialogOpen = $state(false);
     let isServerEditDialogOpen = $state(false);
     let isManageMemberDialogOpen = $state(false);
+    let isCreateChannelDialogOpen = $state(false);
 </script>
 
  
@@ -66,8 +68,10 @@
         {/if}
 
         {#if isModerator}
-            <DropdownMenu.Item class="px-3 py-2 cursor-pointer">
-                Create Channels
+            <DropdownMenu.Item 
+                class="px-3 py-2 cursor-pointer"
+                onclick={() => { isCreateChannelDialogOpen = true }}
+                >Create Channels
                 <CirclePlus class="size-4 ml-auto"/>
             </DropdownMenu.Item>
         {/if}
@@ -97,3 +101,4 @@
 <InviteMember bind:inviteDialogOpen={inviteDialogOpen} {currentServer}/>
 <ServerSettings bind:isServerEditDialogOpen={isServerEditDialogOpen} {currentServer}/>
 <ManageMember bind:isManageMemberDialogOpen={isManageMemberDialogOpen} {members}/>
+<CreateChannel bind:isCreateChannelDialogOpen={isCreateChannelDialogOpen}/>
