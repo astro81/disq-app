@@ -8,6 +8,7 @@
 	import ServerSettings from "$lib/components/modals/ServerSettings.svelte";
 	import ManageMember from "../modals/ManageMember.svelte";
 	import CreateChannel from "../modals/CreateChannel.svelte";
+	import LeaveServer from "../modals/LeaveServer.svelte";
 
     
     interface ServerHeaderProps {
@@ -26,6 +27,7 @@
     let isServerEditDialogOpen = $state(false);
     let isManageMemberDialogOpen = $state(false);
     let isCreateChannelDialogOpen = $state(false);
+    let isLeaveServerDialogOpen = $state(false);
 </script>
 
  
@@ -88,8 +90,10 @@
         {/if}
 
         {#if !isAdmin}
-            <DropdownMenu.Item class="text-rose-500 px-3 py-2 cursor-pointer">
-                Leave Server
+            <DropdownMenu.Item 
+                class="text-rose-500 px-3 py-2 cursor-pointer"
+                onclick={() => { isLeaveServerDialogOpen = true }}
+                >Leave Server
                 <LogOut class="text-rose-500 size-4 ml-auto"/>
             </DropdownMenu.Item> 
         {/if}
@@ -98,7 +102,8 @@
 </DropdownMenu.Root>
 
 <!-- todo: pass the currentServer from the store -->
-<InviteMember bind:inviteDialogOpen={inviteDialogOpen} {currentServer}/>
-<ServerSettings bind:isServerEditDialogOpen={isServerEditDialogOpen} {currentServer}/>
-<ManageMember bind:isManageMemberDialogOpen={isManageMemberDialogOpen} {members}/>
-<CreateChannel bind:isCreateChannelDialogOpen={isCreateChannelDialogOpen}/>
+<InviteMember bind:inviteDialogOpen {currentServer}/>
+<ServerSettings bind:isServerEditDialogOpen {currentServer}/>
+<ManageMember bind:isManageMemberDialogOpen {members}/>
+<CreateChannel bind:isCreateChannelDialogOpen/>
+<LeaveServer bind:isLeaveServerDialogOpen/>
