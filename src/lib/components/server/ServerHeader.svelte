@@ -9,6 +9,7 @@
 	import ManageMember from "../modals/ManageMember.svelte";
 	import CreateChannel from "../modals/CreateChannel.svelte";
 	import LeaveServer from "../modals/LeaveServer.svelte";
+	import DeleteServer from "../modals/DeleteServer.svelte";
 
     
     interface ServerHeaderProps {
@@ -28,6 +29,7 @@
     let isManageMemberDialogOpen = $state(false);
     let isCreateChannelDialogOpen = $state(false);
     let isLeaveServerDialogOpen = $state(false);
+    let isDeleteServerDialogOpen = $state(false);
 </script>
 
  
@@ -83,8 +85,10 @@
         {/if}
 
         {#if isAdmin}
-            <DropdownMenu.Item class="text-rose-500 px-3 py-2 cursor-pointer">
-                Delete Server
+            <DropdownMenu.Item 
+                class="text-rose-500 px-3 py-2 cursor-pointer"
+                onclick={() => { isDeleteServerDialogOpen = true }}
+                >Delete Server
                 <Trash class="text-rose-500 size-4 ml-auto"/>
             </DropdownMenu.Item>
         {/if}
@@ -107,3 +111,4 @@
 <ManageMember bind:isManageMemberDialogOpen {members}/>
 <CreateChannel bind:isCreateChannelDialogOpen/>
 <LeaveServer bind:isLeaveServerDialogOpen/>
+<DeleteServer bind:isDeleteServerDialogOpen/>

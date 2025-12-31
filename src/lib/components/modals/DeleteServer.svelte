@@ -3,10 +3,10 @@
 	import Button from "../ui/button/button.svelte";
 	import { currentServerStore } from "$lib/stores/server-state.svelte";
 	import { goto } from "$app/navigation";
-	import { leaveServer } from "$lib/remote/server/leave-server.remote";
+	import { deleteServer } from "$lib/remote/server/delete-server.remote";
 
 
-    let { isLeaveServerDialogOpen = $bindable() } = $props();
+    let { isDeleteServerDialogOpen = $bindable() } = $props();
 
     const currentServer = $derived(currentServerStore.currentServer);
 
@@ -14,21 +14,22 @@
 
 </script>
  
-<Dialog.Root bind:open={isLeaveServerDialogOpen}>
+<Dialog.Root bind:open={isDeleteServerDialogOpen}>
     <Dialog.Content class="sm:max-w-[525px]">
         <Dialog.Header>
-            <Dialog.Title>Leave Server</Dialog.Title>
-            <Dialog.Description class="text-center text-zinc-500">Are you sure you want to leave 
+            <Dialog.Title>Delete Server</Dialog.Title>
+            <Dialog.Description class="text-center text-zinc-500">Are you sure you want to delete 
                 <span class="font-semibold text-indigo-500/90">{currentServer?.serverName}</span>?
             </Dialog.Description>
         </Dialog.Header>
-        
+    
+
         <Dialog.Footer class="py-4">
             <div class="flex items-center justify-between w-full">
                 <Button 
                     disabled={isLoading}     
 
-                    onclick={() => { isLeaveServerDialogOpen = false; }}
+                    onclick={() => { isDeleteServerDialogOpen = false; }}
                     variant="ghost"
                     >Cancel</Button>
 
@@ -39,14 +40,14 @@
                         try {
                             isLoading = true;
 
-                            await leaveServer({ serverId: currentServer?.serverId ?? "" })
+                            await deleteServer({ serverId: currentServer?.serverId ?? "" })
 
-                            isLeaveServerDialogOpen = false;
+                            isDeleteServerDialogOpen = false;
 
                             goto("/server/@me");
                         } catch (error: any) {
                             console.log(error);
-                            alert(error?.message ?? "Failed to leave server");
+                            alert(error?.message ?? "Failed to delete server");
                         } finally {
                             isLoading = false;
                         }
