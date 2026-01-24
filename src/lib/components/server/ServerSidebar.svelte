@@ -3,8 +3,9 @@
 	import { currentServerStore } from '$lib/stores/server-state.svelte';
 
     import { getUserState } from '$lib/stores/user-state.svelte';
+	import ScrollArea from '../ui/scroll-area/scroll-area.svelte';
 	import ServerHeader from './ServerHeader.svelte';
-	
+	import ServerSearch from './ServerSearch.svelte';
 
     interface ServerSidebarProps { serverId: string; }
 
@@ -62,5 +63,47 @@
 
 <div class="flex flex-col size-full text-primary dark:bg-[#2b2d31] bg-[#f2f3f5]">
     <ServerHeader {currentServer} {role} {members}/>
-    {currentServer.server.serverName}
+    
+    <ScrollArea class="flex-1 px-3">
+        <div class="mt-2">
+            <ServerSearch data={[
+                {
+                    label: "Text Channels",
+                    type: "channel",
+                    data: textChannels?.map((channel) => ({
+                        id: channel.channelId,
+                        name: channel.channelName,
+                        type: channel.channelType
+                    }))
+                },
+                {
+                    label: "Voice Channels",
+                    type: "channel",
+                    data: voiceChannels?.map((channel) => ({
+                        id: channel.channelId,
+                        name: channel.channelName,
+                        type: channel.channelType
+                    }))
+                },
+                {
+                    label: "Video Channels",
+                    type: "channel",
+                    data: videoChannels?.map((channel) => ({
+                        id: channel.channelId,
+                        name: channel.channelName,
+                        type: channel.channelType
+                    }))
+                },
+                {
+                    label: "Members",
+                    type: "member",
+                    data: members?.map((member) => ({
+                        id: member.memberId,
+                        name: member.username ?? "User",
+                        type: member.role
+                    }))
+                }
+            ]}/>
+        </div>
+    </ScrollArea>
 </div>

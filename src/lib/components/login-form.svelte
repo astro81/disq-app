@@ -24,7 +24,7 @@
 	let message = $state('');
   	message = page.url.searchParams.get('message') ?? ''; 
 
-	const redirectTo = page.url.searchParams.get("redirectTo") ?? "/channels/@me";
+	const redirectTo = page.url.searchParams.get("redirectTo") ?? "/servers/@me";
 
 	async function loginWithGoogle() {
         await authClient.signIn.social({

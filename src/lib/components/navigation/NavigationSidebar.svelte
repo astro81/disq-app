@@ -7,6 +7,7 @@
 	import ModeToggleButton from "../ui/button/ModeToggleButton.svelte";
 	import UserButton from "../profile/UserButton.svelte";
 	import CreateServer from "../modals/CreateServer.svelte";
+	import UserNavigationItem from "./UserNavigationItem.svelte";
 	
     interface JoinedServerProps {
         serverId: string;
@@ -25,6 +26,9 @@
 </script>
 
 <div class="space-y-4 flex flex-col items-center h-full text-primary w-full dark:bg-[#1e1f22] py-3">
+
+    <UserNavigationItem />
+
     <CreateServer />
 
     <Separator class="h-[2px] bg-zinc-300 dark:bg-zinc-700 rounded-md w-10! mx-auto"/>
