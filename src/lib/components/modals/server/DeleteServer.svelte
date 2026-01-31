@@ -1,9 +1,18 @@
 <script lang="ts">
-    import * as Dialog from "$lib/components/ui/dialog/index.js";
-	import Button from "../ui/button/button.svelte";
-	import { currentServerStore } from "$lib/stores/server-state.svelte";
-	import { goto } from "$app/navigation";
+    import { goto } from "$app/navigation";
+    
 	import { deleteServer } from "$lib/remote/server/delete-server.remote";
+
+    import { currentServerStore } from "$lib/stores/server-state.svelte";
+
+	import Button from "$lib/components/ui/button/button.svelte";
+
+    import Dialog from "$lib/components/ui/dialog/dialog.svelte";
+    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
+    import DialogDescription from "$lib/components/ui/dialog/dialog-description.svelte";
+    import DialogFooter from "$lib/components/ui/dialog/dialog-footer.svelte";
 
 
     let { isDeleteServerDialogOpen = $bindable() } = $props();
@@ -14,17 +23,17 @@
 
 </script>
  
-<Dialog.Root bind:open={isDeleteServerDialogOpen}>
-    <Dialog.Content class="sm:max-w-[525px]">
-        <Dialog.Header>
-            <Dialog.Title>Delete Server</Dialog.Title>
-            <Dialog.Description class="text-center text-zinc-500">Are you sure you want to delete 
+<Dialog bind:open={isDeleteServerDialogOpen}>
+    <DialogContent class="sm:max-w-[525px]">
+        <DialogHeader>
+            <DialogTitle class="text-center">Delete Server</DialogTitle>
+            <DialogDescription class="text-center text-zinc-500">Are you sure you want to delete 
                 <span class="font-semibold text-indigo-500/90">{currentServer?.serverName}</span>?
-            </Dialog.Description>
-        </Dialog.Header>
+            </DialogDescription>
+        </DialogHeader>
     
 
-        <Dialog.Footer class="py-4">
+        <DialogFooter class="py-4">
             <div class="flex items-center justify-between w-full">
                 <Button 
                     disabled={isLoading}     
@@ -44,7 +53,7 @@
 
                             isDeleteServerDialogOpen = false;
 
-                            goto("/server/@me");
+                            goto("/servers/@me");
                         } catch (error: any) {
                             console.log(error);
                             alert(error?.message ?? "Failed to delete server");
@@ -54,7 +63,7 @@
                     }}
                 >Confirm</Button>
             </div>
-        </Dialog.Footer>
+        </DialogFooter>
 
-    </Dialog.Content>
-</Dialog.Root>
+    </DialogContent>
+</Dialog>

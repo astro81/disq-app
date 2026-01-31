@@ -1,19 +1,32 @@
 <script lang="ts">
-    import * as Dialog from "$lib/components/ui/dialog/index.js";
-	import { CircleAlert } from "@lucide/svelte";
-	import Button from "../ui/button/button.svelte";
-	import Input from "../ui/input/input.svelte";
+    import { createChannel } from "$lib/remote/channel/create-channel.remote";
 
-	import { currentServerStore } from "$lib/stores/server-state.svelte";
+    import type { ServerChannelType } from "$lib/types/server";
 
-    import * as Field from "$lib/components/ui/field";
+    import { currentServerStore } from "$lib/stores/server-state.svelte";
 
-	import Select from "../ui/select/select.svelte";
-    import SelectTrigger from "../ui/select/select-trigger.svelte";
-	import SelectContent from "../ui/select/select-content.svelte";
-	import SelectItem from "../ui/select/select-item.svelte";
-	import { createChannel } from "$lib/remote/channel/create-channel.remote";
-	import type { ServerChannelType } from "$lib/types/server";
+    import { CircleAlert } from "@lucide/svelte";
+
+	import Button from "$lib/components/ui/button/button.svelte";
+	import Input from "$lib/components/ui/input/input.svelte";
+
+    import Dialog from "$lib/components/ui/dialog/dialog.svelte";
+    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
+    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+    import DialogFooter from "$lib/components/ui/dialog/dialog-footer.svelte";
+
+    import Field from "$lib/components/ui/field/field.svelte";
+    import FieldSet from "$lib/components/ui/field/field-set.svelte";
+    import FieldGroup from "$lib/components/ui/field/field-group.svelte";
+    import FieldLabel from "$lib/components/ui/field/field-label.svelte";
+    import FieldError from "$lib/components/ui/field/field-error.svelte";
+
+	import Select from "$lib/components/ui/select/select.svelte";
+    import SelectTrigger from "$lib/components/ui/select/select-trigger.svelte";
+	import SelectContent from "$lib/components/ui/select/select-content.svelte";
+	import SelectItem from "$lib/components/ui/select/select-item.svelte";
+
 
     interface CreateChannelProps {
         isCreateChannelDialogOpen: boolean;
@@ -48,11 +61,11 @@
 
 </script>
  
-<Dialog.Root bind:open={isCreateChannelDialogOpen}>
-    <Dialog.Content class="sm:max-w-[425px]">
-        <Dialog.Header>
-            <Dialog.Title>Create Channel</Dialog.Title>
-        </Dialog.Header>
+<Dialog bind:open={isCreateChannelDialogOpen}>
+    <DialogContent class="sm:max-w-[425px]">
+        <DialogHeader>
+            <DialogTitle>Create Channel</DialogTitle>
+        </DialogHeader>
             
         <form 
             {...createChannel.enhance(async ({ submit, form }) => {
@@ -91,23 +104,23 @@
             {/if}
             
 
-            <Field.Set>
-                <Field.Group class="gap-2">
+            <FieldSet>
+                <FieldGroup class="gap-2">
 
                     <!-- Channel Name -->
-                    <Field.Field data-invalid={(createChannel.fields.channelName?.issues() ?? []).length > 0}>
-                        <Field.Label for="channelName">Channel Name</Field.Label>
+                    <Field data-invalid={(createChannel.fields.channelName?.issues() ?? []).length > 0}>
+                        <FieldLabel for="channelName">Channel Name</FieldLabel>
                         <Input {...createChannel.fields.channelName.as('text')} placeholder="Enter a unique channel name"/>
-                        <Field.Error>
+                        <FieldError>
                             {#each createChannel.fields.channelName.issues() ?? [] as issue}
                                 <p>{issue.message}</p>
                             {/each}
-                        </Field.Error>
-                    </Field.Field>
+                        </FieldError>
+                    </Field>
 
                     <!-- Channel Type -->
-                    <Field.Field>
-                        <Field.Label for="channelType">Channel Type</Field.Label>
+                    <Field>
+                        <FieldLabel for="channelType">Channel Type</FieldLabel>
                         <Select 
                             type="single" 
                             bind:value={selectValue} 
@@ -123,20 +136,20 @@
 
                         <input type="hidden" name="channelType" value={selectValue || "TEXT"} />
                         <input type="hidden" name="serverId" value={currentServer?.serverId} />
-                    </Field.Field>
+                    </Field>
 
-                </Field.Group>
-            </Field.Set>
+                </FieldGroup>
+            </FieldSet>
 
 
-            <Dialog.Footer>
+            <DialogFooter>
                 <Button 
                     type="submit" 
                     disabled={isLoading}
                     class="bg-indigo-500 text-foreground hover:bg-indigo-500/90"
                     >Create</Button>
-            </Dialog.Footer>
+            </DialogFooter>
 
         </form>
-    </Dialog.Content>
-</Dialog.Root>
+    </DialogContent>
+</Dialog>

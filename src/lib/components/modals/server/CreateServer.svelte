@@ -1,16 +1,29 @@
 <script lang="ts">
-    import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
-    import * as Dialog from "$lib/components/ui/dialog/index.js";
-    import Input from "$lib/components/ui/input/input.svelte";
-	import { createServer } from "$lib/remote/server/create-server.remote";
+    import { browser } from "$app/environment";
 
-    import * as Field from "$lib/components/ui/field";
+	import { createServer } from "$lib/remote/server/create-server.remote";
 
     import { CircleAlert, Plus } from "@lucide/svelte";
 
-	import { browser } from "$app/environment";
-	import CreateServerImageUploader from "./CreateServerImageUploader.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
+    import Input from "$lib/components/ui/input/input.svelte";
 
+    import Dialog from "$lib/components/ui/dialog/dialog.svelte";
+    import DialogTrigger from "$lib/components/ui/dialog/dialog-trigger.svelte";
+    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
+    import DialogDescription from "$lib/components/ui/dialog/dialog-description.svelte";
+    import DialogFooter from "$lib/components/ui/dialog/dialog-footer.svelte";
+
+    import FieldSet from "$lib/components/ui/field/field-set.svelte";
+    import FieldGroup from "$lib/components/ui/field/field-group.svelte";
+    import Field from "$lib/components/ui/field/field.svelte";
+    import FieldLabel from "$lib/components/ui/field/field-label.svelte";
+    import FieldError from "$lib/components/ui/field/field-error.svelte";
+
+    import CreateServerImageUploader from "$lib/components/modals/server/CreateServerImageUploader.svelte";
+    
 
     let isOpen = $state(false);
     let isLoading = $state(false);
@@ -18,18 +31,18 @@
 
 </script>
  
-<Dialog.Root bind:open={isOpen}>
+<Dialog bind:open={isOpen}>
 
-    <Dialog.Trigger class="flex mx-3 h-[48px] w-[48px] rounded-[24px] group-hover:rounded-[16px] 
+    <DialogTrigger class="flex mx-3 h-[48px] w-[48px] rounded-[24px] group-hover:rounded-[16px] 
             transition-all overflow-hidden items-center justify-center bg-background dark:bg-neutral-700 group-hover:bg-emerald-500">
         <Plus class="group-hover:text-white transition text-emerald-500" size="25"/>
-    </Dialog.Trigger>
+    </DialogTrigger>
 
-    <Dialog.Content class="sm:max-w-[425px]">
-        <Dialog.Header>
-            <Dialog.Title>Create Server</Dialog.Title>
-            <Dialog.Description>Create Your own server</Dialog.Description>
-        </Dialog.Header>
+    <DialogContent class="sm:max-w-[425px]">
+        <DialogHeader>
+            <DialogTitle>Create Server</DialogTitle>
+            <DialogDescription>Create Your own server</DialogDescription>
+        </DialogHeader>
             
         <form 
             {...createServer.enhance(async ({ submit, form }) => {
@@ -55,19 +68,19 @@
             {/if}
             
 
-            <Field.Set>
-                <Field.Group class="gap-2">
+            <FieldSet>
+                <FieldGroup class="gap-2">
 
                     <!-- Server Name -->
-                    <Field.Field data-invalid={(createServer.fields.serverName?.issues() ?? []).length > 0}>
-                        <Field.Label for="serverName">Server Name</Field.Label>
+                    <Field data-invalid={(createServer.fields.serverName?.issues() ?? []).length > 0}>
+                        <FieldLabel for="serverName">Server Name</FieldLabel>
                         <Input {...createServer.fields.serverName.as('text')} placeholder="Enter a unique server name"/>
-                        <Field.Error>
+                        <FieldError>
                             {#each createServer.fields.serverName.issues() ?? [] as issue}
                                 <p>{issue.message}</p>
                             {/each}
-                        </Field.Error>
-                    </Field.Field>
+                        </FieldError>
+                    </Field>
 
                     <!-- Uploader (CLIENT ONLY) -->
                     {#if browser}
@@ -77,20 +90,20 @@
                     <!-- Hidden input for form submission -->
                     <input type="hidden" name="serverImage" value={imageUrl ?? ""} />
 
-                </Field.Group>
-            </Field.Set>
+                </FieldGroup>
+            </FieldSet>
 
 
-            <Dialog.Footer>
+            <DialogFooter>
                 <Button 
                     type="submit" 
                     disabled={isLoading}
                     class="bg-indigo-500 text-foreground hover:bg-indigo-500/90"
                     >Create</Button>
-            </Dialog.Footer>
+            </DialogFooter>
 
         </form>
 
-    </Dialog.Content>
+    </DialogContent>
 
-</Dialog.Root>
+</Dialog>

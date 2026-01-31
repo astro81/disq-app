@@ -4,12 +4,12 @@
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
 	import { ChevronDown, CirclePlus, LogOut, Settings, Trash, UserPlus, Users } from "@lucide/svelte";
-	import InviteMember from "$lib/components/modals/InviteMember.svelte";
-	import ServerSettings from "$lib/components/modals/ServerSettings.svelte";
-	import ManageMember from "../modals/ManageMember.svelte";
-	import CreateChannel from "../modals/CreateChannel.svelte";
-	import LeaveServer from "../modals/LeaveServer.svelte";
-	import DeleteServer from "../modals/DeleteServer.svelte";
+	import InviteMember from "$lib/components/modals/server/InviteMember.svelte";
+	import ServerSettings from "$lib/components/modals/server/ServerSettings.svelte";
+	import ManageMember from "../modals/server/ManageMember.svelte";
+	import CreateChannel from "../modals/channels/CreateChannel.svelte";
+	import LeaveServer from "../modals/server/LeaveServer.svelte";
+	import DeleteServer from "../modals/server/DeleteServer.svelte";
 
     
     interface ServerHeaderProps {

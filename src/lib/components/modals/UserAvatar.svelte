@@ -1,8 +1,10 @@
 <script lang="ts">
-	import Avatar from "$lib/components/ui/avatar/avatar.svelte";
-	import { cn } from "$lib/utils";
-	import AvatarImage from "../ui/avatar/avatar-image.svelte";
+    import { cn } from "$lib/utils";
 
+	import Avatar from "$lib/components/ui/avatar/avatar.svelte";
+	import AvatarImage from "$lib/components/ui/avatar/avatar-image.svelte";
+
+    
     interface UserAvatarProps {
         src?: string | null;
         className?: string | null;

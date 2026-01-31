@@ -1,23 +1,42 @@
 <script lang="ts">
-    import * as Dialog from "$lib/components/ui/dialog/index.js";
-	import { currentServerStore } from "$lib/stores/server-state.svelte";
-	import ScrollArea from "$lib/components/ui/scroll-area/scroll-area.svelte";
-	import UserAvatar from "$lib/components/modals/UserAvatar.svelte";
-	import { Check, EllipsisVertical, Gavel, LoaderCircle, Shield, ShieldAlert, ShieldCheck, ShieldQuestionMark } from "@lucide/svelte";
-
-	import DropdownMenu from "../ui/dropdown-menu/dropdown-menu.svelte";
-	import DropdownMenuTrigger from "../ui/dropdown-menu/dropdown-menu-trigger.svelte";
-	import DropdownMenuContent from "../ui/dropdown-menu/dropdown-menu-content.svelte";
-	import DropdownMenuSub from "../ui/dropdown-menu/dropdown-menu-sub.svelte";
-	import DropdownMenuSubTrigger from "../ui/dropdown-menu/dropdown-menu-sub-trigger.svelte";
-	import DropdownMenuPortal from "../ui/dropdown-menu/dropdown-menu-portal.svelte";
-	import DropdownMenuSubContent from "../ui/dropdown-menu/dropdown-menu-sub-content.svelte";
-	import DropdownMenuItem from "../ui/dropdown-menu/dropdown-menu-item.svelte";
-	import DropdownMenuSeparator from "../ui/dropdown-menu/dropdown-menu-separator.svelte";
-
-	import type { ServerMemberRole } from "$lib/types/server";
 	import { changeMemberRole } from "$lib/remote/server/change-role.remote";
 	import { kickServerMember } from "$lib/remote/server/kick-member.remote";
+
+    import type { ServerMemberRole } from "$lib/types/server";
+
+    import { currentServerStore } from "$lib/stores/server-state.svelte";
+
+    import { 
+        Check, 
+        EllipsisVertical, 
+        Gavel, 
+        LoaderCircle, 
+        Shield, 
+        ShieldAlert, 
+        ShieldCheck, 
+        ShieldQuestionMark 
+    } from "@lucide/svelte";
+
+	import ScrollArea from "$lib/components/ui/scroll-area/scroll-area.svelte";
+
+    import Dialog from "$lib/components/ui/dialog/dialog.svelte";
+    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
+    import DialogDescription from "$lib/components/ui/dialog/dialog-description.svelte";
+
+	import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
+	import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
+	import DropdownMenuContent from "$lib/components/ui/dropdown-menu/dropdown-menu-content.svelte";
+	import DropdownMenuSub from "$lib/components/ui/dropdown-menu/dropdown-menu-sub.svelte";
+	import DropdownMenuSubTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-sub-trigger.svelte";
+	import DropdownMenuPortal from "$lib/components/ui/dropdown-menu/dropdown-menu-portal.svelte";
+	import DropdownMenuSubContent from "$lib/components/ui/dropdown-menu/dropdown-menu-sub-content.svelte";
+	import DropdownMenuItem from "$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte";
+	import DropdownMenuSeparator from "$lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte";
+
+    import UserAvatar from "$lib/components/modals/UserAvatar.svelte";
+
 
     let { isManageMemberDialogOpen = $bindable(), members } = $props();
 
@@ -52,14 +71,14 @@
 
 </script>
  
-<Dialog.Root bind:open={isManageMemberDialogOpen}>
-    <Dialog.Content class="sm:max-w-[525px]">
-        <Dialog.Header>
-            <Dialog.Title>Manage Members</Dialog.Title>
-            <Dialog.Description class="text-zinc-500">
+<Dialog bind:open={isManageMemberDialogOpen}>
+    <DialogContent class="sm:max-w-[525px]">
+        <DialogHeader>
+            <DialogTitle>Manage Members</DialogTitle>
+            <DialogDescription class="text-zinc-500">
                 {currentServer?.memberCount} Members
-            </Dialog.Description>
-        </Dialog.Header>
+            </DialogDescription>
+        </DialogHeader>
         
         <ScrollArea class="mt-8 max-h-[420px] pr-6">
             {#each members as member}
@@ -78,7 +97,7 @@
                         <p class="text-xs text-zinc-500 ">{member.userEmail}</p>
                     </div>
 
-                    <!--! Only admin is allowd and no actions can be performed on admin, do not show options for admin -->
+                    <!--! Only admin is allowed and no actions can be performed on admin, do not show options for admin -->
                     {#if currentServer?.memberUserId !== member.userId && loadingId !== member.memberId}
                         <div class="ml-auto">
                             <DropdownMenu>
@@ -132,5 +151,5 @@
             {/each}
         </ScrollArea>
 
-    </Dialog.Content>
-</Dialog.Root>
+    </DialogContent>
+</Dialog>

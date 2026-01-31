@@ -1,9 +1,17 @@
 <script lang="ts">
 	import { page } from "$app/state";
+
 	import type { ChannelProps, ServerMemberRole, ServerProps } from "$lib/types/server";
-	import { cn } from "$lib/utils";
-	import { Hash, Lock, Mic, SquarePen, Trash, Video } from "@lucide/svelte";
-	import ActionTooltip from "../navigation/ActionTooltip.svelte";
+	
+    import { cn } from "$lib/utils";
+	
+    import { Hash, Lock, Mic, SquarePen, Trash, Video } from "@lucide/svelte";
+
+    import DeleteChannel from "$lib/components/modals/channels/DeleteChannel.svelte";
+	import EditChannel from "$lib/components/modals/channels/EditChannel.svelte";
+
+	import ActionTooltip from "$lib/components/navigation/ActionTooltip.svelte";
+
 
     interface ServerChannelProps {
         channel: ChannelProps;
@@ -12,6 +20,9 @@
     }
 
     let { channel, server, role }: ServerChannelProps = $props();
+
+    let isEditChannelDialogOpen = $state(false);
+    let isDeleteChannelDialogOpen = $state(false);
 </script>
 
 <div>
@@ -43,11 +54,16 @@
         {#if channel.channelName !== "general" && role !== "GUEST"}
             <div class="ml-auto flex items-center gap-x-2">
                 <ActionTooltip label="Edit" side="top">
-                    <SquarePen class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"/>
+                    <SquarePen 
+                        onclick={() => isEditChannelDialogOpen = true}
+                        class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"/>
                 </ActionTooltip>
                 
                 <ActionTooltip label="Delete" side="top">
-                    <Trash class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"/>
+                    <Trash 
+                        onclick={() => isDeleteChannelDialogOpen = true}
+                        class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"
+                        />
                 </ActionTooltip>
             </div>
         {/if}
@@ -57,3 +73,7 @@
         {/if}
     </button>
 </div>
+
+
+<DeleteChannel bind:isDeleteChannelDialogOpen {channel}/>
+<EditChannel bind:isEditChannelDialogOpen {channel}/>

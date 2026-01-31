@@ -6,7 +6,7 @@
 	import NavigationItem from "./NavigationItem.svelte";
 	import ModeToggleButton from "../ui/button/ModeToggleButton.svelte";
 	import UserButton from "../profile/UserButton.svelte";
-	import CreateServer from "../modals/CreateServer.svelte";
+	import CreateServer from "../modals/server/CreateServer.svelte";
 	import UserNavigationItem from "./UserNavigationItem.svelte";
 	
     interface JoinedServerProps {
@@ -25,7 +25,7 @@
     let joinedServers = $derived<JoinedServerProps[]>(await getJoinedServers());
 </script>
 
-<div class="space-y-4 flex flex-col items-center h-full text-primary w-full dark:bg-[#1e1f22] py-3">
+<div class="space-y-4 flex flex-col items-center h-full text-primary w-full dark:bg-[#1e1f22] bg-sidebar-border py-3">
 
     <UserNavigationItem />
 

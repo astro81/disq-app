@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { MemberProps, ServerChannelType, ServerMemberRole } from "$lib/types/server";
 	import { Plus, Settings } from "@lucide/svelte";
-	import CreateChannel from "$lib/components/modals/CreateChannel.svelte";
-	import ManageMember from "../modals/ManageMember.svelte";
+	import CreateChannel from "$lib/components/modals/channels/CreateChannel.svelte";
+	import ManageMember from "../modals/server/ManageMember.svelte";
 
     interface ServerSectionProps {
         sectionType: "channels" | "members";
@@ -10,7 +10,7 @@
         role?: ServerMemberRole;
         channelType?: ServerChannelType;
         // server?: any;  // ServerWithMembersWithProfiles
-        members?: MemberProps[];
+        currentServerMembersList?: MemberProps[];
     }
 
     let {
@@ -18,7 +18,7 @@
         label, 
         role, 
         channelType, 
-        members
+        currentServerMembersList
     }: ServerSectionProps = $props();
 
     let isCreateChannelDialogOpen = $state(false);
@@ -49,4 +49,4 @@
 </div>
 
 <CreateChannel bind:isCreateChannelDialogOpen {channelType}/>
-<ManageMember bind:isManageMemberDialogOpen {members}/>
+<ManageMember bind:isManageMemberDialogOpen members={currentServerMembersList}/>

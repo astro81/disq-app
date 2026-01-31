@@ -1,6 +1,7 @@
 <script lang="ts">
+    import { onMount } from "svelte";
+
     import { X } from "@lucide/svelte";
-	import { onMount } from "svelte";
 
     let { imageUrl = $bindable() } = $props();
 

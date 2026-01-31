@@ -1,15 +1,27 @@
 <script lang="ts">
-    import { Button, buttonVariants } from "$lib/components/ui/button/index.js";
-    import * as Dialog from "$lib/components/ui/dialog/index.js";
+    import { browser } from "$app/environment";
+
+    import { createServer } from "$lib/remote/server/create-server.remote";
+
+    import { CircleAlert } from "@lucide/svelte";
+
+    import { Button } from "$lib/components/ui/button/index.js";
     import Input from "$lib/components/ui/input/input.svelte";
-	import { createServer } from "$lib/remote/server/create-server.remote";
 
-    import * as Field from "$lib/components/ui/field";
+    import Dialog from "$lib/components/ui/dialog/dialog.svelte";
+    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
+    import DialogDescription from "$lib/components/ui/dialog/dialog-description.svelte";
+    import DialogFooter from "$lib/components/ui/dialog/dialog-footer.svelte";
 
-    import { CircleAlert, Plus } from "@lucide/svelte";
+    import FieldSet from "$lib/components/ui/field/field-set.svelte";
+    import FieldGroup from "$lib/components/ui/field/field-group.svelte";
+    import Field from "$lib/components/ui/field/field.svelte";
+    import FieldLabel from "$lib/components/ui/field/field-label.svelte";
+    import FieldError from "$lib/components/ui/field/field-error.svelte";
 
-	import { browser } from "$app/environment";
-	import CreateServerImageUploader from "./CreateServerImageUploader.svelte";
+	import CreateServerImageUploader from "$lib/components/modals/server/CreateServerImageUploader.svelte";
 
 
     let { 
@@ -21,12 +33,12 @@
     let imageUrl: string | null = $state(null);
 </script>
  
-<Dialog.Root bind:open={isServerEditDialogOpen}>
-    <Dialog.Content class="sm:max-w-[425px]">
-        <Dialog.Header>
-            <Dialog.Title>Edit Server</Dialog.Title>
-            <Dialog.Description>Create Your own server</Dialog.Description>
-        </Dialog.Header>
+<Dialog bind:open={isServerEditDialogOpen}>
+    <DialogContent class="sm:max-w-[425px]">
+        <DialogHeader>
+            <DialogTitle>Edit Server</DialogTitle>
+            <DialogDescription>Create Your own server</DialogDescription>
+        </DialogHeader>
             
 
         <!--todo: update server -->
@@ -54,19 +66,19 @@
             {/if}
             
 
-            <Field.Set>
-                <Field.Group class="gap-2">
+            <FieldSet>
+                <FieldGroup class="gap-2">
 
                     <!-- Server Name -->
-                    <Field.Field data-invalid={(createServer.fields.serverName?.issues() ?? []).length > 0}>
-                        <Field.Label for="serverName">Server Name</Field.Label>
+                    <Field data-invalid={(createServer.fields.serverName?.issues() ?? []).length > 0}>
+                        <FieldLabel for="serverName">Server Name</FieldLabel>
                         <Input {...createServer.fields.serverName.as('text')} placeholder="Enter a unique server name" value={currentServer.server.serverName}/>
-                        <Field.Error>
+                        <FieldError>
                             {#each createServer.fields.serverName.issues() ?? [] as issue}
                                 <p>{issue.message}</p>
                             {/each}
-                        </Field.Error>
-                    </Field.Field>
+                        </FieldError>
+                    </Field>
 
                     {#if currentServer.server.serverImageUrl}
                         <img src={currentServer.server.serverImageUrl} alt="server"/>
@@ -77,20 +89,20 @@
                     <!-- Hidden input for form submission -->
                     <input type="hidden" name="serverImage" value={imageUrl ?? ""} />
 
-                </Field.Group>
-            </Field.Set>
+                </FieldGroup>
+            </FieldSet>
 
 
-            <Dialog.Footer>
+            <DialogFooter>
                 <Button 
                     type="submit" 
                     disabled={isLoading}
                     class="bg-indigo-500 text-foreground hover:bg-indigo-500/90"
                     >Save</Button>
-            </Dialog.Footer>
+            </DialogFooter>
 
         </form>
 
-    </Dialog.Content>
+    </DialogContent>
 
-</Dialog.Root>
+</Dialog>

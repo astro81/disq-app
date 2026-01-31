@@ -1,12 +1,19 @@
 <script lang="ts">
-    import * as Dialog from "$lib/components/ui/dialog/index.js";
-	import { Check, Copy, RefreshCw } from "@lucide/svelte";
-	import Button from "../ui/button/button.svelte";
-	import Input from "../ui/input/input.svelte";
-	import Label from "../ui/label/label.svelte";
-	import { onMount } from "svelte";
+    import { onMount } from "svelte";
 	import { browser } from "$app/environment";
-	import { inviteCode } from "$lib/remote/server/invite-code.remote";
+    
+    import { inviteCode } from "$lib/remote/server/invite-code.remote";
+
+	import { Check, Copy, RefreshCw } from "@lucide/svelte";
+	
+    import Button from "$lib/components/ui/button/button.svelte";
+	import Input from "$lib/components/ui/input/input.svelte";
+	import Label from "$lib/components/ui/label/label.svelte";
+
+    import Dialog from "$lib/components/ui/dialog/dialog.svelte";
+    import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+    import DialogHeader from "$lib/components/ui/dialog/dialog-header.svelte";
+    import DialogTitle from "$lib/components/ui/dialog/dialog-title.svelte";
 
 
     let { 
@@ -36,11 +43,11 @@
 
 </script>
  
-<Dialog.Root bind:open={inviteDialogOpen}>
-    <Dialog.Content class="sm:max-w-[525px]">
-        <Dialog.Header>
-            <Dialog.Title>Invite People</Dialog.Title>
-        </Dialog.Header>
+<Dialog bind:open={inviteDialogOpen}>
+    <DialogContent class="sm:max-w-[525px]">
+        <DialogHeader>
+            <DialogTitle>Invite People</DialogTitle>
+        </DialogHeader>
         
         <div class="mt-2">
             <Label class="uppercase text-xs font-bold text-zinc-500">Server Invite Link</Label>
@@ -80,5 +87,5 @@
             </Button>
         </div>
 
-    </Dialog.Content>
-</Dialog.Root>
+    </DialogContent>
+</Dialog>

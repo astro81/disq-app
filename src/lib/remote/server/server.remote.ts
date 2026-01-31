@@ -57,27 +57,8 @@ export const getCurrentServer = query(z.object({ serverId: z.string() }), async 
 })
 
 
-export const getAllServerChannels = query(z.object({ serverId: z.string() }), async ({ serverId }) => {
-    return await db
-        .select({
-            channelId: channel.channelId,
-            channelName: channel.channelName,
-            channelType: channel.channelType,
-            position: channel.position,
-            serverId: channel.serverId,
-            createdBy: channel.createdBy,
-            createdAt: channel.createdAt,
-            updatedAt: channel.updatedAt,
-            creatorName: user.name, 
-        })
-        .from(channel)
-        .leftJoin(user, eq(channel.createdBy, user.id))
-        .where(eq(channel.serverId, serverId))
-        .orderBy(channel.position);
-})
 
-
-export const getServerMembers = query(z.object({ serverId: z.string() }), async ({ serverId }) => {
+export const getServerMembersList = query(z.object({ serverId: z.string() }), async ({ serverId }) => {
     return await db
         .select({
             memberId: member.memberId,

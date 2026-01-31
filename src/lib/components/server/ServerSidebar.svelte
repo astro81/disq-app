@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { getAllServerChannels, getServerMembers, getCurrentServer } from '$lib/remote/server/server.remote';
+	import { getAllServerChannelsList } from '$lib/remote/channel/channel.remote';
+    import { getServerMembersList, getCurrentServer } from '$lib/remote/server/server.remote';
 	import { currentServerStore } from '$lib/stores/server-state.svelte';
 
     import { getUserState } from '$lib/stores/user-state.svelte';
@@ -21,22 +22,21 @@
     let serverData = $derived(
         Promise.all([
             getCurrentServer({ serverId }),
-            getAllServerChannels({ serverId }),
-            getServerMembers({ serverId })
+            getAllServerChannelsList({ serverId }),
+            getServerMembersList({ serverId })
         ])
     );
 
     // Destructure the resolved data
     let currentServer = $derived(await serverData.then(([server]) => server));
-    let currentServerChannels = $derived(await serverData.then(([, channels]) => channels));
-    let currentServerMembers = $derived(await serverData.then(([, , members]) => members));
+    let currentServerChannelsList = $derived(await serverData.then(([, channels]) => channels));
+    let currentServerAllMembersList = $derived(await serverData.then(([, , members]) => members));
 
+    let textChannelsList = $derived(currentServerChannelsList.filter(channel => channel.channelType === 'TEXT'));
+    let voiceChannelsList = $derived(currentServerChannelsList.filter(channel => channel.channelType === 'VOICE'));
+    let videoChannelsList = $derived(currentServerChannelsList.filter(channel => channel.channelType === 'VIDEO'));
 
-    let textChannels = $derived(currentServerChannels.filter(channel => channel.channelType === 'TEXT'));
-    let voiceChannels = $derived(currentServerChannels.filter(channel => channel.channelType === 'VOICE'));
-    let videoChannels = $derived(currentServerChannels.filter(channel => channel.channelType === 'VIDEO'));
-
-    const members = $derived(currentServerMembers.filter(member => member.userId !== userState.user?.id));
+    const currentServerMembersList = $derived(currentServerAllMembersList.filter(member => member.userId !== userState.user?.id));
 
     const role = $derived(currentServer.member.role);
 
@@ -59,14 +59,14 @@
             memberCreatedAt: currentServer.member.createdAt,
             memberUpdatedAt: currentServer.member.updatedAt,
 
-            memberCount: members.length + 1                 // current user was excluded from the members list
+            memberCount: currentServerMembersList.length + 1                 // current user was excluded from the members list
         });
     })
 
 </script>
 
 <div class="flex flex-col size-full text-primary dark:bg-[#2b2d31] bg-[#f2f3f5]">
-    <ServerHeader {currentServer} {role} {members}/>
+    <ServerHeader {currentServer} {role} members={currentServerMembersList}/>
     
     <ScrollArea class="flex-1 px-3">
         <div class="mt-2">
@@ -74,7 +74,7 @@
                 {
                     label: "Text Channels",
                     type: "channel",
-                    data: textChannels?.map((channel) => ({
+                    data: textChannelsList?.map((channel) => ({
                         id: channel.channelId,
                         name: channel.channelName,
                         type: channel.channelType
@@ -83,7 +83,7 @@
                 {
                     label: "Voice Channels",
                     type: "channel",
-                    data: voiceChannels?.map((channel) => ({
+                    data: voiceChannelsList?.map((channel) => ({
                         id: channel.channelId,
                         name: channel.channelName,
                         type: channel.channelType
@@ -92,7 +92,7 @@
                 {
                     label: "Video Channels",
                     type: "channel",
-                    data: videoChannels?.map((channel) => ({
+                    data: videoChannelsList?.map((channel) => ({
                         id: channel.channelId,
                         name: channel.channelName,
                         type: channel.channelType
@@ -101,7 +101,7 @@
                 {
                     label: "Members",
                     type: "member",
-                    data: members?.map((member) => ({
+                    data: currentServerMembersList?.map((member) => ({
                         id: member.memberId,
                         name: member.username ?? "User",
                         type: member.role
@@ -112,7 +112,7 @@
 
         <Separator class="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2"/>
 
-        {#if textChannels.length > 0}
+        {#if textChannelsList.length > 0}
             <div class="mb-2">
                 <ServerSection 
                     sectionType="channels"
@@ -120,7 +120,7 @@
                     channelType="TEXT"
                     {role}
                 />
-                {#each textChannels as channel}
+                {#each textChannelsList as channel}
                     <ServerChannel 
                         {channel}
                         {role}
@@ -130,7 +130,7 @@
             </div>
         {/if}
 
-        {#if voiceChannels.length > 0}
+        {#if voiceChannelsList.length > 0}
             <div class="mb-2">
                 <ServerSection 
                     sectionType="channels"
@@ -138,7 +138,7 @@
                     channelType="VOICE"
                     {role}
                 />
-                {#each voiceChannels as channel}
+                {#each voiceChannelsList as channel}
                     <ServerChannel 
                         {channel}
                         {role}
@@ -148,7 +148,7 @@
             </div>
         {/if}
 
-        {#if videoChannels.length > 0}
+        {#if videoChannelsList.length > 0}
             <div class="mb-2">
                 <ServerSection 
                     sectionType="channels"
@@ -156,7 +156,7 @@
                     channelType="VIDEO"
                     {role}
                 />
-                {#each videoChannels as channel}
+                {#each videoChannelsList as channel}
                     <ServerChannel 
                         {channel}
                         {role}
@@ -166,16 +166,16 @@
             </div>
         {/if}
 
-        {#if members.length > 0}
+        {#if currentServerMembersList.length > 0}
             <div class="mb-2">
                 <ServerSection 
                     sectionType="members"
                     label="Members"
                     {role}
-                    {members}
+                    {currentServerMembersList}
                 />
 
-                {#each members as member}
+                {#each currentServerMembersList as member}
                     <ServerMember {member} server={currentServer.server}/>
                 {/each}
 
