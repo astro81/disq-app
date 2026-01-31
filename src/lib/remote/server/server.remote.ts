@@ -64,6 +64,7 @@ export const getAllServerChannels = query(z.object({ serverId: z.string() }), as
             channelName: channel.channelName,
             channelType: channel.channelType,
             position: channel.position,
+            serverId: channel.serverId,
             createdBy: channel.createdBy,
             createdAt: channel.createdAt,
             updatedAt: channel.updatedAt,
@@ -82,11 +83,13 @@ export const getServerMembers = query(z.object({ serverId: z.string() }), async 
             memberId: member.memberId,
             role: member.role,
             userId: user.id,
+            serverId: member.serverId,
             username: user.name, 
             userProfileImage: user.image,
             userDisplayName: user.displayName,
             userEmail: user.email,
             joinedAt: member.createdAt,
+            updatedAt: member.updatedAt
         })
         .from(member)
         .leftJoin(user, eq(member.userId, user.id))

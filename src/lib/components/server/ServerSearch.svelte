@@ -23,8 +23,6 @@
 
     let { data }: ServerSearchProps = $props();
 
-    $inspect(data);
-
     let open = $state(false);
 
     function handleKeydown(e: KeyboardEvent) {
@@ -39,7 +37,7 @@
 
         if (type === "member") goto(`/servers/${page.params.serverId}/conversations/${id}`);
 
-        if (type === "channel") goto(`/server/${page.params.serverId}/channels/${id}`);
+        if (type === "channel") goto(`/servers/${page.params.serverId}/channels/${id}`);
     }
 </script>
 

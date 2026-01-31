@@ -4,8 +4,8 @@
 	import AvatarImage from "../ui/avatar/avatar-image.svelte";
 
     interface UserAvatarProps {
-        src?: string;
-        className?: string;
+        src?: string | null;
+        className?: string | null;
     };
 
     let { src, className }: UserAvatarProps = $props();

@@ -4,8 +4,12 @@
 
     import { getUserState } from '$lib/stores/user-state.svelte';
 	import ScrollArea from '../ui/scroll-area/scroll-area.svelte';
+	import Separator from '../ui/separator/separator.svelte';
+	import ServerChannel from './ServerChannel.svelte';
 	import ServerHeader from './ServerHeader.svelte';
+	import ServerMember from './ServerMember.svelte';
 	import ServerSearch from './ServerSearch.svelte';
+	import ServerSection from './ServerSection.svelte';
 
     interface ServerSidebarProps { serverId: string; }
 
@@ -105,5 +109,78 @@
                 }
             ]}/>
         </div>
+
+        <Separator class="bg-zinc-200 dark:bg-zinc-700 rounded-md my-2"/>
+
+        {#if textChannels.length > 0}
+            <div class="mb-2">
+                <ServerSection 
+                    sectionType="channels"
+                    label="Text Channels"
+                    channelType="TEXT"
+                    {role}
+                />
+                {#each textChannels as channel}
+                    <ServerChannel 
+                        {channel}
+                        {role}
+                        server={currentServer.server}
+                    />
+                {/each}
+            </div>
+        {/if}
+
+        {#if voiceChannels.length > 0}
+            <div class="mb-2">
+                <ServerSection 
+                    sectionType="channels"
+                    label="Voice Channels"
+                    channelType="VOICE"
+                    {role}
+                />
+                {#each voiceChannels as channel}
+                    <ServerChannel 
+                        {channel}
+                        {role}
+                        server={currentServer.server}
+                    />
+                {/each}
+            </div>
+        {/if}
+
+        {#if videoChannels.length > 0}
+            <div class="mb-2">
+                <ServerSection 
+                    sectionType="channels"
+                    label="Video Channels"
+                    channelType="VIDEO"
+                    {role}
+                />
+                {#each videoChannels as channel}
+                    <ServerChannel 
+                        {channel}
+                        {role}
+                        server={currentServer.server}
+                    />
+                {/each}
+            </div>
+        {/if}
+
+        {#if members.length > 0}
+            <div class="mb-2">
+                <ServerSection 
+                    sectionType="members"
+                    label="Members"
+                    {role}
+                    {members}
+                />
+
+                {#each members as member}
+                    <ServerMember {member} server={currentServer.server}/>
+                {/each}
+
+            </div>
+        {/if}
+
     </ScrollArea>
 </div>

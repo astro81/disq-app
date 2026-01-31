@@ -5,7 +5,6 @@
 	import Input from "../ui/input/input.svelte";
 
 	import { currentServerStore } from "$lib/stores/server-state.svelte";
-	import { createServer } from "$lib/remote/server/create-server.remote";
 
     import * as Field from "$lib/components/ui/field";
 
@@ -14,10 +13,17 @@
 	import SelectContent from "../ui/select/select-content.svelte";
 	import SelectItem from "../ui/select/select-item.svelte";
 	import { createChannel } from "$lib/remote/channel/create-channel.remote";
+	import type { ServerChannelType } from "$lib/types/server";
+
+    interface CreateChannelProps {
+        isCreateChannelDialogOpen: boolean;
+        channelType?: ServerChannelType;
+    }
 
     let { 
         isCreateChannelDialogOpen = $bindable(),
-    } = $props();
+        channelType
+    }: CreateChannelProps = $props();
 
     const currentServer = $derived(currentServerStore.currentServer);
 
@@ -34,6 +40,10 @@
     const selectTriggerContent = $derived(
         channelSelectTypes.find((c) => c.value === selectValue)?.label ?? channelSelectTypes[0].label
     )
+
+    $effect(() => {
+        selectValue = channelType ?? "TEXT";
+    });
 
 
 </script>
