@@ -1,21 +1,27 @@
 <script lang="ts">
     import type { LayoutProps } from './$types';
 
-	import { getCurrentServer } from '$lib/remote/server/server.remote';
-	import { page } from '$app/state';
 	import ServerSidebar from '$lib/components/server/ServerSidebar.svelte';
 
     let { data, children }: LayoutProps = $props();
     
-    let currentServer = $derived(await getCurrentServer({ serverId: page.params.serverId ?? ""}));
-
+    let currentServer = $derived(await data.currentServer);
+    let currentMember = $derived(await data.currentMember);
+    let currentServerChannelsList = $derived(await data.currentServerChannelsList);
+    let currentServerMemberList = $derived(await data.currentServerMemberList);
+    
 </script>
 
 
-{#if currentServer?.server}
+{#if currentServer}
     <div class="h-full">
         <div class="hidden fixed md:flex h-full w-60 z-20 flex-col inset-y-0">
-            <ServerSidebar serverId={currentServer.server.serverId}/>
+            <ServerSidebar 
+                {currentServer}
+                {currentMember}
+                {currentServerChannelsList}
+                {currentServerMemberList}
+            />
         </div>
 
         <main class="h-full md:pl-60">{@render children()}</main>

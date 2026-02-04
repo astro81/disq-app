@@ -12,7 +12,11 @@
 </script>
 
 <ActionTooltip side="right" align="center" label="Direct Messages">
-	<a href="/servers/@me" class="group relative flex items-center">
+	<a 
+		data-sveltekit-preload-data="hover"
+		href="/servers/@me" 
+		class="group relative flex items-center"
+	>
 		<!-- indicator -->
 		<div
 			class={cn(

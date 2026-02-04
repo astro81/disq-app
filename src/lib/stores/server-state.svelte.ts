@@ -15,12 +15,6 @@ export type CurrentServer = {
     updatedAt: Date;
     createdBy: string;
 
-    memberId: string;
-    role: "MODERATOR" | "ADMIN" | "GUEST";
-    memberUserId: string;
-    memberCreatedAt: Date;
-    memberUpdatedAt: Date;
-
     memberCount: number;
 };
 

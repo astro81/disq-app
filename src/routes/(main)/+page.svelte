@@ -34,5 +34,12 @@
     <Button variant="default" href="/login">Login</Button>
 {/if}
 
+<Button 
+    data-sveltekit-preload-data="hover"
+    href="servers/@me" 
+    variant="link"
+    >Welcome
+</Button>
+
 
 <ModeToggleButton />

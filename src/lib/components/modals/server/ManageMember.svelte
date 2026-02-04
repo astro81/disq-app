@@ -5,6 +5,7 @@
     import type { ServerMemberRole } from "$lib/types/server";
 
     import { currentServerStore } from "$lib/stores/server-state.svelte";
+	import { currentMemberStore } from "$lib/stores/member-state.svelte";
 
     import { 
         Check, 
@@ -43,6 +44,7 @@
     let loadingId = $state("");
 
     const currentServer = $derived(currentServerStore.currentServer);
+    const currentMember = $derived(currentMemberStore.currentMember);
 
     const onRoleChange = async (memberId: string, role: ServerMemberRole, serverId: string) => {
         try {
@@ -98,7 +100,7 @@
                     </div>
 
                     <!--! Only admin is allowed and no actions can be performed on admin, do not show options for admin -->
-                    {#if currentServer?.memberUserId !== member.userId && loadingId !== member.memberId}
+                    {#if currentMember?.memberUserId !== member.userId && loadingId !== member.memberId}
                         <div class="ml-auto">
                             <DropdownMenu>
                                 <DropdownMenuTrigger>

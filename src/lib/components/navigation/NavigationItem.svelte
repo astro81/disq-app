@@ -16,7 +16,8 @@
 </script>
 
 <ActionTooltip side="right" align="center" label={serverName}>
-    <a
+    <a  
+        data-sveltekit-preload-data="hover"
         href="/servers/{serverId}"
         class="group relative flex items-center">
         <!-- server indicator -->

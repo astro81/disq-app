@@ -1,12 +1,10 @@
 <script lang="ts">
-    import { getCurrentServer } from '$lib/remote/server/server.remote';
-	import { getAllServerChannelsList } from '$lib/remote/channel/channel.remote';
-	import { getServerMembersList } from '$lib/remote/member/member.remote';
-
-	import { currentServerStore } from '$lib/stores/server-state.svelte';
+	
+    import type { ChannelProps, MemberProps, ServerProps } from '$lib/types/server';
 
     import { getUserState } from '$lib/stores/user-state.svelte';
-	
+	import { currentServerStore } from '$lib/stores/server-state.svelte';
+
     import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	
@@ -17,52 +15,42 @@
 	import ServerSection from '$lib/components/server/ServerSection.svelte';
 
 
-    interface ServerSidebarProps { serverId: string; }
+    interface ServerSidebarProps { 
+        currentServer: ServerProps;
+        currentMember: MemberProps;
+        currentServerChannelsList: ChannelProps[];
+        currentServerMemberList: MemberProps[]; 
+    }
 
-    let { serverId }: ServerSidebarProps = $props();
+    let { 
+        currentServer,
+        currentMember,
+        currentServerChannelsList,
+        currentServerMemberList,
+    }: ServerSidebarProps = $props();
 
     const userState = getUserState();
-
-    // Fetch all data in parallel
-    let serverData = $derived(
-        Promise.all([
-            getCurrentServer({ serverId }),
-            getAllServerChannelsList({ serverId }),
-            getServerMembersList({ serverId })
-        ])
-    );
-
-    // Destructure the resolved data
-    let currentServer = $derived(await serverData.then(([server]) => server));
-    let currentServerChannelsList = $derived(await serverData.then(([, channels]) => channels));
-    let currentServerAllMembersList = $derived(await serverData.then(([, , members]) => members));
 
     let textChannelsList = $derived(currentServerChannelsList.filter(channel => channel.channelType === 'TEXT'));
     let voiceChannelsList = $derived(currentServerChannelsList.filter(channel => channel.channelType === 'VOICE'));
     let videoChannelsList = $derived(currentServerChannelsList.filter(channel => channel.channelType === 'VIDEO'));
 
-    const currentServerMembersList = $derived(currentServerAllMembersList.filter(member => member.userId !== userState.user?.id));
+    const currentServerMembersList = $derived(currentServerMemberList.filter(member => member.userId !== userState.user?.id));
 
-    const role = $derived(currentServer.member.role);
+    const role = $derived(currentMember.role);
 
 
     $effect(() => {
         currentServerStore.set({
-            serverId: currentServer.server.serverId,
-            serverName: currentServer.server.serverName,
-            serverImageUrl: currentServer.server.serverImageUrl,
-            serverBannerImageUrl: currentServer.server.serverBannerImageUrl,
-            serverDescription: currentServer.server.serverDescription,
-            serverInviteCode: currentServer.server.serverInviteCode,
-            createdAt: currentServer.server.createdAt,
-            updatedAt: currentServer.server.updatedAt,
-            createdBy: currentServer.server.createdBy,
-
-            memberId: currentServer.member.memberId,
-            role: currentServer.member.role,
-            memberUserId: currentServer.member.userId,
-            memberCreatedAt: currentServer.member.createdAt,
-            memberUpdatedAt: currentServer.member.updatedAt,
+            serverId: currentServer.serverId,
+            serverName: currentServer.serverName,
+            serverImageUrl: currentServer.serverImageUrl,
+            serverBannerImageUrl: currentServer.serverBannerImageUrl,
+            serverDescription: currentServer.serverDescription,
+            serverInviteCode: currentServer.serverInviteCode,
+            createdAt: currentServer.createdAt,
+            updatedAt: currentServer.updatedAt,
+            createdBy: currentServer.createdBy,
 
             memberCount: currentServerMembersList.length + 1                 // current user was excluded from the members list
         });
@@ -129,7 +117,7 @@
                     <ServerChannel 
                         {channel}
                         {role}
-                        server={currentServer.server}
+                        server={currentServer}
                     />
                 {/each}
             </div>
@@ -147,7 +135,7 @@
                     <ServerChannel 
                         {channel}
                         {role}
-                        server={currentServer.server}
+                        server={currentServer}
                     />
                 {/each}
             </div>
@@ -165,7 +153,7 @@
                     <ServerChannel 
                         {channel}
                         {role}
-                        server={currentServer.server}
+                        server={currentServer}
                     />
                 {/each}
             </div>
@@ -181,7 +169,7 @@
                 />
 
                 {#each currentServerMembersList as member}
-                    <ServerMember {member} server={currentServer.server}/>
+                    <ServerMember {member} server={currentServer}/>
                 {/each}
 
             </div>

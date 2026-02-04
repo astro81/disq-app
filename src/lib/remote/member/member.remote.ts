@@ -4,6 +4,7 @@ import { user } from "$lib/server/db/auth-schema";
 import { member } from "$lib/server/db/server-schema";
 import z from "zod";
 import { and, eq } from "drizzle-orm";
+import { requireAuth } from "$lib/server/utils/session-checker";
 
 
 export const getServerMembersList = query(z.object({ serverId: z.string() }), async ({ serverId }) => {
@@ -31,10 +32,11 @@ export const getServerMembersList = query(z.object({ serverId: z.string() }), as
 export const getCurrentServerUserMember = query(
     z.object({ 
         serverId: z.string(),  
-        userId: z.string()
     }), 
-    async ({ serverId, userId }) => {
-        const currentMember = await db.query.member.findFirst({
+    async ({ serverId }) => {
+        const currentUser = requireAuth();
+
+        const serverMember = await db.query.member.findFirst({
             columns: {
                 memberId: true,
                 role: true,
@@ -45,11 +47,37 @@ export const getCurrentServerUserMember = query(
             },
             where: and(
                 eq(member.serverId, serverId),
-                eq(member.userId, userId)
+                eq(member.userId, currentUser.id)
             )
         });
 
-        if (!currentMember) throw new Error('Member not found!');
+        if (!serverMember) throw new Error('Member not found!');
+
+        const memberProfile = await db.query.user.findFirst({
+            columns: {
+                name: true,
+                image: true,
+                profileBannerImage: true,
+                email: true,
+            },
+            where: eq(user.id, serverMember.userId)
+        })
+
+        if (!memberProfile) throw new Error('Profile not found!');
+
+        const currentMember = {
+			memberId: serverMember.memberId,
+			role: serverMember.role,
+			userId: serverMember.userId,
+			serverId: serverMember.serverId,
+			username: memberProfile.name,
+			userDisplayName: memberProfile.name,
+			userProfileImage: memberProfile.image,
+			userBannerImage: memberProfile.profileBannerImage,
+			userEmail: memberProfile.email,
+			joinedAt: serverMember.createdAt,
+			updatedAt: serverMember.updatedAt
+		};
 
         return currentMember;
     }

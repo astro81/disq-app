@@ -2,7 +2,9 @@
 	import type { 
         ServerMemberAllProps, 
         ServerResponseProps, 
-        ServerMemberRole 
+        ServerMemberRole, 
+		ServerProps
+
     } from "$lib/types/server";
 
 
@@ -31,7 +33,7 @@
 
     
     interface ServerHeaderProps {
-        currentServer: ServerResponseProps,
+        currentServer: ServerProps,
         role: ServerMemberRole,
         members: ServerMemberAllProps[]
     }
@@ -57,7 +59,7 @@
             <button {...props} class="w-full text-md font-semibold px-3 
                 flex items-center h-12 border-neutral-200 dark:border-neutral-800 border-b-2
                 hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition">
-                {currentServer.server.serverName}
+                {currentServer.serverName}
                 <ChevronDown class="size-5 ml-auto"/>
             </button>
         {/snippet}

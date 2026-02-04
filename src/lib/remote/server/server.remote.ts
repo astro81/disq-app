@@ -34,14 +34,22 @@ export const getJoinedServers = query(async () => {
 
 
 export const getCurrentServer = query(z.object({ serverId: z.string() }), async ({ serverId }) => {
+    const currentServer = await db.query.server.findFirst({
+        columns: {
+            serverId: true,
+            serverName: true,
+            serverDescription: true,
+            serverImageUrl: true,
+            serverBannerImageUrl: true,
+            serverInviteCode: true,
+            createdBy: true,
+            createdAt: true,
+            updatedAt: true,
+        },
+        where: eq(server.serverId, serverId)
+    });
 
-    const user = requireAuth();
-
-    const [currentServer] = await db
-        .select()
-        .from(server)
-        .innerJoin(member, eq(member.serverId, server.serverId))
-        .where(and(eq(server.serverId, serverId), eq(member.userId, user.id)));
-
+    if (!currentServer) throw new Error("Server not found!");
+    
     return currentServer;
 })

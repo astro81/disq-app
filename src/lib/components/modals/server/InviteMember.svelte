@@ -27,7 +27,7 @@
         origin = browser ? window.location.origin : "";
     });
 
-    const inviteUrl = $derived(origin + `/invite/${currentServer.server?.serverInviteCode}`);
+    const inviteUrl = $derived(origin + `/invite/${currentServer.serverInviteCode}`);
 
     let copied = $state(false);
     let isLoading = $state(false);
@@ -71,11 +71,11 @@
                 size="sm"
                 class="text-xs text-zinc-500 mt-4 px-0!"
                 onclick={async () => {
-                    if (!currentServer.server?.serverId) alert("server Id not available");
+                    if (!currentServer.serverId) alert("server Id not available");
 
                     try {
                         isLoading = true;
-                        await inviteCode({ serverId: currentServer.server?.serverId });
+                        await inviteCode({ serverId: currentServer.serverId });
                     } catch (error) {
                         alert(error);
                     } finally {
