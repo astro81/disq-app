@@ -1,10 +1,11 @@
 import { command } from "$app/server";
 import { db } from "$lib/server/db";
-import { channel, member, server } from "$lib/server/db/server-schema";
+import { server } from "$lib/server/db/server-schema";
 import { requireAuth, type User } from "$lib/server/utils/session-checker";
 import { error } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+
 
 export const deleteServer = command(
     z.object({

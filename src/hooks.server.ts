@@ -62,7 +62,7 @@ const lastPathHook: Handle = async ({ event, resolve }) => {
 // *Redirect logged-in users away from /login 
 const loginRedirectHook: Handle = async ({ event, resolve }) => {
 	if (event.locals.user && event.url.pathname === '/login') {
-		const lastPath = event.cookies.get('disq.lastPath') ?? '/channels';
+		const lastPath = event.cookies.get('disq.lastPath') ?? '/servers';
 		throw redirect(302, lastPath);
 	}
 
@@ -72,7 +72,7 @@ const loginRedirectHook: Handle = async ({ event, resolve }) => {
 
 // !Protected routes
 const protectedRoutesHook: Handle = async ({ event, resolve }) => {
-	if (event.url.pathname.startsWith('/channels')) {
+	if (event.url.pathname.startsWith('/servers')) {
 		if (!event.locals.user || !event.locals.session) {
 			throw redirect(302, handleLoginRedirect(event));
 		}

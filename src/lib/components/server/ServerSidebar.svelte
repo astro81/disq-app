@@ -1,16 +1,21 @@
 <script lang="ts">
+    import { getCurrentServer } from '$lib/remote/server/server.remote';
 	import { getAllServerChannelsList } from '$lib/remote/channel/channel.remote';
-    import { getServerMembersList, getCurrentServer } from '$lib/remote/server/server.remote';
+	import { getServerMembersList } from '$lib/remote/member/member.remote';
+
 	import { currentServerStore } from '$lib/stores/server-state.svelte';
 
     import { getUserState } from '$lib/stores/user-state.svelte';
-	import ScrollArea from '../ui/scroll-area/scroll-area.svelte';
-	import Separator from '../ui/separator/separator.svelte';
-	import ServerChannel from './ServerChannel.svelte';
-	import ServerHeader from './ServerHeader.svelte';
-	import ServerMember from './ServerMember.svelte';
-	import ServerSearch from './ServerSearch.svelte';
-	import ServerSection from './ServerSection.svelte';
+	
+    import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
+	import Separator from '$lib/components/ui/separator/separator.svelte';
+	
+    import ServerChannel from '$lib/components/server/ServerChannel.svelte';
+	import ServerHeader from '$lib/components/server/ServerHeader.svelte';
+	import ServerMember from '$lib/components/server/ServerMember.svelte';
+	import ServerSearch from '$lib/components/server/ServerSearch.svelte';
+	import ServerSection from '$lib/components/server/ServerSection.svelte';
+
 
     interface ServerSidebarProps { serverId: string; }
 

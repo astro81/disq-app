@@ -1,7 +1,9 @@
 <script lang="ts">
-	import ActionTooltip from "./ActionTooltip.svelte";
+    import { page } from "$app/state";
+
     import { cn } from "$lib/utils";
-	import { page } from "$app/state";
+
+    import ActionTooltip from "$lib/components/navigation/ActionTooltip.svelte";
 
     interface NavigationItemProps {
         serverId: string;

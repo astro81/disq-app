@@ -1,13 +1,16 @@
 <script lang="ts">
-	import { Hash, Mic, Search, ShieldAlert, ShieldCheck, Video } from "@lucide/svelte";
-	import CommandDialog from "../ui/command/command-dialog.svelte";
-	import CommandInput from "../ui/command/command-input.svelte";
-	import CommandList from "../ui/command/command-list.svelte";
-	import CommandEmpty from "../ui/command/command-empty.svelte";
-	import CommandGroup from "../ui/command/command-group.svelte";
-	import CommandItem from "../ui/command/command-item.svelte";
-	import { goto } from "$app/navigation";
+    import { goto } from "$app/navigation";
 	import { page } from "$app/state";
+
+	import { Hash, Mic, Search, ShieldAlert, ShieldCheck, Video } from "@lucide/svelte";
+
+	import CommandDialog from "$lib/components/ui/command/command-dialog.svelte";
+	import CommandInput from "$lib/components/ui/command/command-input.svelte";
+	import CommandList from "$lib/components/ui/command/command-list.svelte";
+	import CommandEmpty from "$lib/components/ui/command/command-empty.svelte";
+	import CommandGroup from "$lib/components/ui/command/command-group.svelte";
+	import CommandItem from "$lib/components/ui/command/command-item.svelte";
+
 
     interface ServerSearchProps {
         data: {

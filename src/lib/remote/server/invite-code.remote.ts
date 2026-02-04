@@ -1,19 +1,11 @@
-import { command, getRequestEvent } from "$app/server";
+import { command } from "$app/server";
 import { db } from "$lib/server/db";
 import { server } from "$lib/server/db/server-schema";
-import { error, redirect } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
 import { getCurrentServer } from "./server.remote";
-
-
-const requireAuth = () => {
-    const { locals } = getRequestEvent();
-
-    if (!locals.user || !locals.session) redirect(307, '/login');
-
-    return locals.user;
-}
+import { requireAuth } from "$lib/server/utils/session-checker";
 
 
 export const inviteCode = command(z.object({ serverId: z.string() }), async({ serverId }) => {

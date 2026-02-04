@@ -1,10 +1,10 @@
 <script lang="ts">
     import type { Snippet } from 'svelte';
 
-	import Tooltip from "../ui/tooltip/tooltip.svelte";
-	import TooltipProvider from "../ui/tooltip/tooltip-provider.svelte";
-	import TooltipTrigger from "../ui/tooltip/tooltip-trigger.svelte";
-	import TooltipContent from "../ui/tooltip/tooltip-content.svelte";
+	import Tooltip from "$lib/components/ui/tooltip/tooltip.svelte";
+	import TooltipProvider from "$lib/components/ui/tooltip/tooltip-provider.svelte";
+	import TooltipTrigger from "$lib/components/ui/tooltip/tooltip-trigger.svelte";
+	import TooltipContent from "$lib/components/ui/tooltip/tooltip-content.svelte";
 
     interface tooltipProps {
         children: Snippet,

@@ -1,18 +1,10 @@
-import { form, getRequestEvent } from "$app/server";
+import { form } from "$app/server";
 import { db } from "$lib/server/db";
 import { channel } from "$lib/server/db/server-schema";
-import { invalid, redirect } from "@sveltejs/kit";
+import { requireAuth } from "$lib/server/utils/session-checker";
+import { invalid } from "@sveltejs/kit";
 import { eq, max } from "drizzle-orm";
 import { z } from "zod";
-
-
-const requireAuth = () => {
-    const { locals } = getRequestEvent();
-
-    if (!locals.user || !locals.session) redirect(307, '/login');
-
-    return locals.user;
-}
 
 
 export const createChannel = form(

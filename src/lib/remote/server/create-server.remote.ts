@@ -6,15 +6,7 @@ import { z } from "zod";
 import { db } from "$lib/server/db";
 
 import { server, member, channel, channelTypeEnum, memberRoleEnum } from "$lib/server/db/server-schema";
-
-
-const requireAuth = () => {
-    const { locals } = getRequestEvent();
-
-    if (!locals.user || !locals.session) redirect(307, '/login');
-
-    return locals.user;
-}
+import { requireAuth } from "$lib/server/utils/session-checker";
 
 
 export const createServer = form(

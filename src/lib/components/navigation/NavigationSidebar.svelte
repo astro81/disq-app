@@ -1,14 +1,17 @@
 <!-- NavigationSidebar -->
 <script lang="ts">
 	import { getJoinedServers } from "$lib/remote/server/server.remote";
-	import Separator from "../ui/separator/separator.svelte";
-	import ScrollArea from "../ui/scroll-area/scroll-area.svelte";
-	import NavigationItem from "./NavigationItem.svelte";
-	import ModeToggleButton from "../ui/button/ModeToggleButton.svelte";
-	import UserButton from "../profile/UserButton.svelte";
-	import CreateServer from "../modals/server/CreateServer.svelte";
-	import UserNavigationItem from "./UserNavigationItem.svelte";
-	
+
+	import Separator from "$lib/components/ui/separator/separator.svelte";
+	import ScrollArea from "$lib/components/ui/scroll-area/scroll-area.svelte";
+    import ModeToggleButton from "$lib/components/ui/button/ModeToggleButton.svelte";
+
+	import UserButton from "$lib/components/profile/UserButton.svelte";
+	import CreateServer from "$lib/components/modals/server/CreateServer.svelte";
+	import UserNavigationItem from "$lib/components/navigation/UserNavigationItem.svelte";
+	import NavigationItem from "$lib/components/navigation/NavigationItem.svelte";
+
+    
     interface JoinedServerProps {
         serverId: string;
         serverName: string;

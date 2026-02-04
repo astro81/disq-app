@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { MemberProps, ServerChannelType, ServerMemberRole } from "$lib/types/server";
-	import { Plus, Settings } from "@lucide/svelte";
-	import CreateChannel from "$lib/components/modals/channels/CreateChannel.svelte";
-	import ManageMember from "../modals/server/ManageMember.svelte";
+	
+    import { Plus, Settings } from "@lucide/svelte";
+	
+    import CreateChannel from "$lib/components/modals/channels/CreateChannel.svelte";
+	import ManageMember from "$lib/components/modals/server/ManageMember.svelte";
 
     interface ServerSectionProps {
         sectionType: "channels" | "members";
@@ -12,6 +14,7 @@
         // server?: any;  // ServerWithMembersWithProfiles
         currentServerMembersList?: MemberProps[];
     }
+
 
     let {
         sectionType, 

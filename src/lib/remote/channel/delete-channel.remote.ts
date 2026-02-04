@@ -7,6 +7,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { getAllServerChannelsList } from "./channel.remote";
 
+
 export const deleteChannel = command(
     z.object({
         channelId: z.string(),

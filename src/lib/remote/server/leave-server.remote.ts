@@ -6,6 +6,7 @@ import { error } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
+
 export const leaveServer = command(
     z.object({
         serverId: z.string()

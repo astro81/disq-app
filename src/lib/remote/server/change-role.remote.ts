@@ -1,19 +1,11 @@
-import { command, getRequestEvent } from "$app/server";
+import { command } from "$app/server";
 import { db } from "$lib/server/db";
-import { member, server } from "$lib/server/db/server-schema";
-import { error, redirect } from "@sveltejs/kit";
+import { member } from "$lib/server/db/server-schema";
+import { error } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
 import z from "zod";
-import { getServerMembers } from "./server.remote";
-
-
-const requireAuth = () => {
-    const { locals } = getRequestEvent();
-
-    if (!locals.user || !locals.session) redirect(307, '/login');
-
-    return locals.user;
-}
+import { getServerMembersList } from "$lib/remote/member/member.remote";
+import { requireAuth } from "$lib/server/utils/session-checker";
 
 
 export const changeMemberRole = command(
@@ -71,7 +63,7 @@ export const changeMemberRole = command(
             .set({ role })
             .where(eq(member.memberId, memberId));
 
-        getServerMembers({ serverId }).refresh();
+        getServerMembersList({ serverId }).refresh();
         
     } catch (err) {
         console.log(`${serverId}`, err);

@@ -11,6 +11,7 @@
 	import EditChannel from "$lib/components/modals/channels/EditChannel.svelte";
 
 	import ActionTooltip from "$lib/components/navigation/ActionTooltip.svelte";
+	import { goto } from "$app/navigation";
 
 
     interface ServerChannelProps {
@@ -27,7 +28,9 @@
 
 <div>
     <button 
-        onclick={() => {}}
+        onclick={ 
+            () => goto(`/servers/${page.params.serverId}/channels/${channel.channelId}`) 
+        }
         class={cn(
             "group pl-2 py-2 pr-4 rounded-md flex items-center gap-x-2 w-full",
             "hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1",
@@ -55,13 +58,19 @@
             <div class="ml-auto flex items-center gap-x-2">
                 <ActionTooltip label="Edit" side="top">
                     <SquarePen 
-                        onclick={() => isEditChannelDialogOpen = true}
+                        onclick={(event) => {
+                            event.stopPropagation();
+                            isEditChannelDialogOpen = true;
+                        }}
                         class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"/>
                 </ActionTooltip>
                 
                 <ActionTooltip label="Delete" side="top">
                     <Trash 
-                        onclick={() => isDeleteChannelDialogOpen = true}
+                        onclick={(event) => {
+                            event.stopPropagation();
+                            isDeleteChannelDialogOpen = true;
+                        }}
                         class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"
                         />
                 </ActionTooltip>

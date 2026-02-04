@@ -1,9 +1,13 @@
 <script lang="ts">
-	import { cn } from "$lib/utils";
-	import { UserRound } from "@lucide/svelte";
-	import ActionTooltip from "./ActionTooltip.svelte";
 	import { page } from "$app/state";
 
+	import { cn } from "$lib/utils";
+	
+	import { UserRound } from "@lucide/svelte";
+	
+	import ActionTooltip from "$lib/components/navigation/ActionTooltip.svelte";
+
+	
 	const isActive = $derived(page.url.pathname === "/servers/@me");
 </script>
 

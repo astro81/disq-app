@@ -1,16 +1,18 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
+
 	import { authClient } from "$lib/auth-client";
 	import { getUserState } from "$lib/stores/user-state.svelte";
-	import AvatarFallback from "../ui/avatar/avatar-fallback.svelte";
-	import AvatarImage from "../ui/avatar/avatar-image.svelte";
-	import Avatar from "../ui/avatar/avatar.svelte";
-    
-	import Button from "../ui/button/button.svelte";
-	import DialogContent from "../ui/dialog/dialog-content.svelte";
-	import DialogTrigger from "../ui/dialog/dialog-trigger.svelte";
-	import Dialog from "../ui/dialog/dialog.svelte";
+	
+	import AvatarFallback from "$lib/components/ui/avatar/avatar-fallback.svelte";
+	import AvatarImage from "$lib/components/ui/avatar/avatar-image.svelte";
+	import Avatar from "$lib/components/ui/avatar/avatar.svelte";
+	import Button from "$lib/components/ui/button/button.svelte";
+	import DialogContent from "$lib/components/ui/dialog/dialog-content.svelte";
+	import DialogTrigger from "$lib/components/ui/dialog/dialog-trigger.svelte";
+	import Dialog from "$lib/components/ui/dialog/dialog.svelte";
 
+	
     const userState = getUserState();
 
     let open = $state(false);
