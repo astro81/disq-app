@@ -6,3 +6,6 @@ export { user, session, account, verification };
 
 import { server, channel, member } from "./server-schema";
 export { server, channel, member };
+
+import { message, conversation, directMessage } from "./chat-schema";
+export { message, conversation, directMessage };

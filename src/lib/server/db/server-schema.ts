@@ -2,6 +2,8 @@ import { index, pgTable, text, timestamp, uniqueIndex, uuid, varchar, integer, p
 import { relations } from "drizzle-orm/relations";
 
 import { user } from "./auth-schema";
+import { conversation, message } from "./chat-schema";
+
 
 export const memberRoleEnum = pgEnum("MemberRole", ["ADMIN", "MODERATOR", "GUEST"]);
 export const channelTypeEnum = pgEnum("ChannelType", ["TEXT", "VOICE", "VIDEO"]);
@@ -88,7 +90,7 @@ export const channel = pgTable("channel", {
     uniqueIndex("channel_unique_name_per_server").on(table.serverId, table.channelName),
 ]);
 
-export const channelsRelations = relations(channel, ({ one }) => ({
+export const channelsRelations = relations(channel, ({ one, many }) => ({
     user: one(user, {
         fields: [channel.createdBy],
         references: [user.id],
@@ -97,6 +99,7 @@ export const channelsRelations = relations(channel, ({ one }) => ({
         fields: [channel.serverId],
         references: [server.serverId],
     }),
+    messages: many(message)
 }));
 
 
@@ -111,7 +114,7 @@ export const serversRelations = relations(server, ({ one, many }) => ({
 }));
 
 
-export const membersRelations = relations(member, ({ one }) => ({
+export const membersRelations = relations(member, ({ one, many }) => ({
     user: one(user, {
         fields: [member.userId],
         references: [user.id],
@@ -119,6 +122,14 @@ export const membersRelations = relations(member, ({ one }) => ({
     server: one(server, {
         fields: [member.serverId],
         references: [server.serverId],
+    }),
+    messages: many(message),
+
+    conversationsInitiated: many(conversation, {
+        relationName: "member_one",
+    }),
+    conversationsReceived: many(conversation, {
+        relationName: "member_two",
     }),
 }));
 
