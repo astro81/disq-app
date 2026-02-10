@@ -82,3 +82,63 @@ export const getCurrentServerUserMember = query(
         return currentMember;
     }
 );
+
+
+// export const getMemberProfile = query(z.object({ memberId: z.string() }), async ({ memberId }) => {
+//     const [result] = await db
+//         .select({
+//             memberId: member.memberId,
+//             role: member.role,
+//             userId: user.id,
+//             serverId: member.serverId,
+//             username: user.name, 
+//             userProfileImage: user.image,
+//             userDisplayName: user.displayName,
+//             userEmail: user.email,
+//             joinedAt: member.createdAt,
+//             updatedAt: member.updatedAt
+//         })
+//         .from(member)
+//         .leftJoin(user, eq(member.userId, user.id))
+//         .where(eq(member.memberId, memberId))
+//         .orderBy(member.role);
+
+//     if (!result) throw new Error("Member not found");
+
+//     return result;
+// });
+
+export const getMemberProfile = query(
+    z.object({ memberId: z.string() }),
+    async ({ memberId }) => {
+        const result = await db.query.member.findFirst({
+            where: eq(member.memberId, memberId),
+            with: { user: {
+                columns: {
+                    id:true,
+                    name:true,
+                    image:true,
+                    displayName:true,
+                    email:true,
+                }
+            }},
+        });
+      
+        if (!result || !result.user) 
+            throw new Error("Member not found");
+      
+        return {
+            memberId: result.memberId,
+            role: result.role,
+            serverId: result.serverId,
+            joinedAt: result.createdAt,
+            updatedAt: result.updatedAt,
+            
+            userId: result.user.id,
+            username: result.user.name,
+            userProfileImage: result.user.image,
+            userDisplayName: result.user.displayName,
+            userEmail: result.user.email,
+        };
+    }
+);

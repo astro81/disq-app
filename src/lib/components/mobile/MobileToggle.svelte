@@ -24,6 +24,6 @@
         <div class="w-18">
             <NavigationSidebar />
         </div>
-        <ServerSidebar {serverId}/>
+        <!-- <ServerSidebar {serverId}/> -->
     </SheetContent>
 </Sheet>

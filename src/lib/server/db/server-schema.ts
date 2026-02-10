@@ -1,5 +1,5 @@
 import { index, pgTable, text, timestamp, uniqueIndex, uuid, varchar, integer, pgEnum } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm/relations";
+import { relations } from "drizzle-orm";
 
 import { user } from "./auth-schema";
 import { conversation, message } from "./chat-schema";

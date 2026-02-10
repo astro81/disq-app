@@ -2,12 +2,13 @@
 	import { Hash } from "@lucide/svelte";
 
 	import MobileToggle from "$lib/components/mobile/MobileToggle.svelte";
+	import UserAvatar from "../modals/UserAvatar.svelte";
 
     interface ChatHeaderProps {
         serverId: string;
         name: string;
         type: "channel" | "conversation";
-        imageUrl?: string;
+        imageUrl?: string | null;
     }
 
     let {
@@ -24,6 +25,10 @@
 
     {#if type === "channel"}
         <Hash class="size-5 text-zinc-500 dark:text-zinc-400 mr-2"/>
+    {/if}
+
+    {#if type === "conversation"}
+        <UserAvatar src={imageUrl} className="size-8 md:size-8 mr-2"/>
     {/if}
 
     <p class="font-semibold text-md">{name}</p>
