@@ -1,7 +1,4 @@
 <script lang="ts">
-	import { goto } from "$app/navigation";
-
-	import { authClient } from "$lib/auth-client";
 	import { getUserState } from "$lib/stores/user-state.svelte";
 	
 	import AvatarFallback from "$lib/components/ui/avatar/avatar-fallback.svelte";
@@ -71,17 +68,13 @@
 
             <div class="mt-4 flex flex-col gap-2">
 				<Button variant="outline" class="w-full">Settings</Button>
-				<Button
-    			    variant="destructive"
-    			    onclick={async () => {
-    			        await authClient.signOut({
-    			            fetchOptions: {
-    			                onSuccess: () => { goto("/login"); }
-    			            }
-    			        })
-    			    }}
-    			>Logout</Button>
+
+				<form method="POST" action="/api/logout">
+        			<Button type="submit" variant="destructive">Logout</Button>
+    			</form>
 			</div>
+
+
 		</DialogContent>
 	</Dialog>
 {/if}

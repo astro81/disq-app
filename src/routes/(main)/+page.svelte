@@ -1,8 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-
-	import { authClient } from '$lib/auth-client.js';
-
 	import Button from '$lib/components/ui/button/button.svelte';
 	import ModeToggleButton from '$lib/components/ui/button/ModeToggleButton.svelte';
     
@@ -19,16 +15,9 @@
     <h1>Hello {data.user.name}</h1>
     <h1>Display Name {data.user.displayName}</h1>
 
-    <Button
-        variant="destructive"
-        onclick={async () => {
-            await authClient.signOut({
-                fetchOptions: {
-                    onSuccess: () => { goto("/login"); }
-                }
-            })
-        }}
-    >Logout</Button>
+	<form method="POST" action="/api/logout">
+    	<Button type="submit" variant="destructive">Logout</Button>
+    </form>
 
 {:else}
     <Button variant="default" href="/login">Login</Button>

@@ -1,11 +1,11 @@
 <script lang="ts">
+	import GalleryVerticalEndIcon from "@lucide/svelte/icons/gallery-vertical-end";
 	import type { ActionData } from "./$types";
-
+	import FieldDescription from "$lib/components/ui/field/field-description.svelte";
 	import * as Card from "$lib/components/ui/card/index.js";
 	import Alert from "$lib/components/ui/alert/alert.svelte";
 	import { TriangleAlert } from "@lucide/svelte";
 	import AlertDescription from "$lib/components/ui/alert/alert-description.svelte";
-
 
 	import Input from "$lib/components/ui/input/input.svelte";
 	import Button from "$lib/components/ui/button/button.svelte";
@@ -16,16 +16,22 @@
 	import FieldSeparator from "$lib/components/ui/field/field-separator.svelte";
 
 
-	import GalleryVerticalEndIcon from "@lucide/svelte/icons/gallery-vertical-end";
-	import FieldDescription from "$lib/components/ui/field/field-description.svelte";
-
-
 	let { form }: { form: ActionData } = $props();
 
 	let message = $derived(form?.message);
+	
+	let password = $state("");
+	let confirmPassword = $state("");
+
+	let passwordMismatch = $derived(
+		password.length >= 0 &&
+		confirmPassword.length >= 0 &&
+		password !== confirmPassword
+	);
+
 </script>
 
-<div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+<div class="flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
 	<div class="flex w-full max-w-sm flex-col gap-6">
 		<a href="##" class="flex items-center gap-2 self-center font-medium">
 			<div
@@ -60,15 +66,20 @@
           			</FieldSeparator>
 					
 					<div class="w-full flex flex-col gap-2">
-						{@render socialSignUp({action: "?/signInGoogle", provider: "Google" })}
-						{@render socialSignUp({action: "?/signInGithub", provider: "Github" })}
-						{@render socialSignUp({action: "?/signInDiscord", provider: "Discord"})}
+						{@render socialSignUp({action: "?/signUpGoogle", provider: "Google" })}
+						{@render socialSignUp({action: "?/signUpGithub", provider: "Github" })}
+						{@render socialSignUp({action: "?/signUpDiscord", provider: "Discord"})}
 					</div>
 
 				</Card.Content>
 			</Card.Root>
 
 		</div>
+		
+		<FieldDescription class="px-6 text-center">
+			By clicking continue, you agree to our <a href="##">Terms of Service</a>
+			and <a href="##">Privacy Policy</a>.
+		</FieldDescription>
 
 	</div>
 </div>
@@ -76,24 +87,41 @@
 
 {#snippet emailSignUp()}
 	<div>
-		<form method="POST" action="?/signInEmail">
+		<form method="POST" action="?/signUpEmail">
 			<FieldGroup>
+				<Field>
+					<FieldLabel for="username">Username</FieldLabel>
+					<Input id="username" name="username" type="text" placeholder="Jon Doe" required/>
+				</Field>
+
 				<Field>
 					<FieldLabel for="email">Email</FieldLabel>
 					<Input id="email" name="email" type="email" placeholder="jon@gmail.com" required/>
 				</Field>
 
 				<Field>
-					<FieldLabel for="password">Password</FieldLabel>
-					<Input id="password" name="password" type="password" required/>
-				</Field>				
+					<div class="grid grid-cols-2 gap-4">
+						<Field>
+							<FieldLabel for="password">Password</FieldLabel>
+							<Input id="password" name="password" type="password" bind:value={password} required/>
+						</Field>
+						<Field>
+							<FieldLabel for="confirm-password">Confirm Password</FieldLabel>
+							<Input id="confirm-password" name="confirm-password" type="password" bind:value={confirmPassword} required/>
+						</Field>
+					</div>
+					
+					{#if passwordMismatch}
+						<FieldDescription class="text-destructive">Passwords do not match.</FieldDescription>
+					{/if}
+				</Field>
 
 				<Field>
 					<Button type="submit">Create Account</Button>
 				</Field>
 
 				<FieldDescription class="w-full flex justify-center">
-          			Don't have an account? <a class="ml-1" href="/register">Sign Up</a>
+          			Already have an account? <a class="ml-1" href="/login">Sign in</a>
         		</FieldDescription>
 			</FieldGroup>
 		</form>
@@ -126,7 +154,7 @@
 					</svg>
 				{/if}
 
-				SignIn with {provider}
+				SignUp with {provider}
 			</Button>
 		</div>
 	</form>

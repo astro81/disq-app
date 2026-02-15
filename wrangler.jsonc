@@ -8,7 +8,8 @@
 	"main": ".svelte-kit/cloudflare/_worker.js",
 	"compatibility_date": "2025-12-11",
 	"compatibility_flags": [
-		"nodejs_als"
+		"nodejs_als",
+		"nodejs_compat"
 	],
 	"assets": {
 		"binding": "ASSETS",
@@ -32,7 +33,14 @@
 	 * Environment Variables
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
-	"vars": { "BETTER_AUTH_URL": "https://disq.disq-code.workers.dev/" }
+	"vars": { 
+		"ORIGIN": "https://disq.disq-code.workers.dev",
+		// "ORIGIN": "http://localhost:8787",
+		
+		"GITHUB_CLIENT_ID": "Ov23liSgucSBbVgcmE3y",
+    	"GOOGLE_CLIENT_ID": "1098329548884-01t3ic3v6ks6r8uhdbit93vsjklkflg0.apps.googleusercontent.com",
+    	"DISCORD_CLIENT_ID": "1449045392212889641"
+	}
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/

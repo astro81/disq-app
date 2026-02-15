@@ -5,13 +5,12 @@ import { getFirstServerChannel, getServerChannel } from '$lib/remote/channel/cha
 import { getCurrentServerUserMember } from '$lib/remote/member/member.remote';
 
 
-export const load = (async ({ params, locals }) => {
+export const load = (async ({ params }) => {
 
     let channel = await getServerChannel({ channelId: params.channelId });
 
     let member = await getCurrentServerUserMember({ 
         serverId: params.serverId,
-        userId: locals.user.id
     });
 
     const firstChannel = await getFirstServerChannel({ serverId: params.serverId });

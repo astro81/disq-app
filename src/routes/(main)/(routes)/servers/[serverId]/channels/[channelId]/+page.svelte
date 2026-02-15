@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { page } from "$app/state";
     import type { PageProps } from "./$types";
 
 	import ChatHeader from "$lib/components/chat/ChatHeader.svelte";
+	import ChatInput from "$lib/components/chat/ChatInput.svelte";
 
 
     let { data }: PageProps = $props();
@@ -13,10 +13,12 @@
 </script>
 
 
-<div class="flex flex-col h-full ">
+<div class="flex flex-col h-screen">
     <ChatHeader 
         name={currentChannel.channelName}
         serverId={currentChannel.serverId}
         type="channel"
     />
+    <div class="flex-1">future messages</div>
+    <ChatInput />
 </div>

@@ -1,20 +1,6 @@
 // lib/auth.ts
 import { getRequestEvent } from "$app/server";
-import { 
-    BETTER_AUTH_SECRET, 
-
-    GITHUB_CLIENT_ID, 
-    GITHUN_CLIENT_SECRET, 
-    GITHUB_OAUTH_REDIRECT_URI, 
-    
-    GOOGLE_CLIENT_ID, 
-    GOOGLE_CLIENT_SECRET, 
-    GOOGLE_OAUTH_REDIRECT_URI, 
-
-    DISCORD_CLIENT_ID,
-    DISCORD_CLIENT_SECRET,
-    DISCORD_OAUTH_REDIRECT_URI
-} from "$env/static/private";
+import { env } from '$env/dynamic/private';
 
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "$lib/server/db";
@@ -25,7 +11,8 @@ import { sveltekitCookies } from "better-auth/svelte-kit";
 
 
 export const auth = betterAuth({
-    secret: BETTER_AUTH_SECRET as string,
+    baseURL: env.ORIGIN,
+    secret: env.BETTER_AUTH_SECRET,
     database: drizzleAdapter(db, {
         provider: "pg",
         schema: { user, session, account, verification }
@@ -35,9 +22,8 @@ export const auth = betterAuth({
 
     socialProviders: {
         github: {
-            clientId: GITHUB_CLIENT_ID as string,
-            clientSecret: GITHUN_CLIENT_SECRET as string,
-            redirectURI: GITHUB_OAUTH_REDIRECT_URI as string,
+            clientId: env.GITHUB_CLIENT_ID,
+            clientSecret: env.GITHUB_CLIENT_SECRET,
             mapProfileToUser: (profile) => { 
                 return { 
                     name: profile.login, 
@@ -47,9 +33,8 @@ export const auth = betterAuth({
             }
         },
         google: {
-            clientId: GOOGLE_CLIENT_ID as string,
-            clientSecret: GOOGLE_CLIENT_SECRET as string,
-            redirectURI: GOOGLE_OAUTH_REDIRECT_URI as string,
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
             mapProfileToUser: (profile) => { 
                 return { 
                     name: profile.name, 
@@ -59,9 +44,8 @@ export const auth = betterAuth({
             },
         },
         discord: {
-            clientId: DISCORD_CLIENT_ID as string,
-            clientSecret: DISCORD_CLIENT_SECRET as string,
-            redirectURI: DISCORD_OAUTH_REDIRECT_URI,
+            clientId: env.DISCORD_CLIENT_ID,
+            clientSecret: env.DISCORD_CLIENT_SECRET,
             mapProfileToUser: (profile) => {
                 return {
                     name: profile.username,
