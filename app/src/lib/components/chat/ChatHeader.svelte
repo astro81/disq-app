@@ -3,6 +3,7 @@
 
 	import MobileToggle from "$lib/components/mobile/MobileToggle.svelte";
 	import UserAvatar from "../modals/UserAvatar.svelte";
+    import SocketIndicator from "$lib/components/socket/SocketIndicator.svelte";
 
     interface ChatHeaderProps {
         serverId: string;
@@ -32,4 +33,9 @@
     {/if}
 
     <p class="font-semibold text-md">{name}</p>
+
+    <div class="ml-auto flex items-center">
+        <SocketIndicator />
+    </div>
+
 </div>

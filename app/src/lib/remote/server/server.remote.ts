@@ -2,7 +2,7 @@ import { query } from "$app/server";
 import { db } from "$lib/server/db";
 import { server, member } from "$lib/server/db/server-schema";
 import { z } from "zod";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { requireAuth } from "$lib/server/utils/session-checker";
 
 

@@ -8,7 +8,7 @@
     let { data }: PageProps = $props();
     
     let currentChannel = $derived(data.channel);
-    let currentMember = $derived(data.member);
+    // let currentMember = $derived(data.member);
 
 </script>
 
@@ -20,5 +20,13 @@
         type="channel"
     />
     <div class="flex-1">future messages</div>
-    <ChatInput />
+    <ChatInput
+            name={currentChannel.channelName}
+            type="channel"
+            apiUrl="/api/socket/messages"
+            query={{
+                channelId: currentChannel.channelId,
+                serverId: currentChannel.serverId
+            }}
+    />
 </div>

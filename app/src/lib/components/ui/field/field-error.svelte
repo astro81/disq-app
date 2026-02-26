@@ -21,7 +21,7 @@
 		// no errors
 		if (!errors) return false;
 
-		// has an error but no message
+		// has an error but no messages
 		if (errors.length === 1 && !errors[0]?.message) {
 			return false;
 		}
