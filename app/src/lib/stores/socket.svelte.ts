@@ -1,4 +1,5 @@
 import { io, type Socket } from "socket.io-client";
+import { PUBLIC_SOCKET_URL } from '$env/static/public';
 
 class SocketState {
 	socket = $state<Socket | null>(null);
@@ -7,7 +8,7 @@ class SocketState {
 	connect() {
 		if (this.socket) return;
 
-		const socket = io("http://localhost:3001", {
+		const socket = io(PUBLIC_SOCKET_URL, {
 			transports: ["websocket"]
 		});
 

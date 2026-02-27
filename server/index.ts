@@ -10,13 +10,14 @@ const httpServer = createServer(app);
 
 export const io = new Server(httpServer, {
     cors: {
-        origin: "http://localhost:5173",
+        // origin: "http://localhost:5173",
+        origin: process.env.PUBLIC_APP_URL,
         methods: ["GET", "POST"]
     }
 });
 
 io.on("connection", (socket) => {
-    console.log("✅ Connected:", socket.id);
+    console.log("Connected:", socket.id);
 
     socket.emit("status", "connected");
 
@@ -30,7 +31,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("disconnect", () => {
-        console.log("❌ Disconnected:", socket.id);
+        console.log("Disconnected:", socket.id);
     });
 });
 
@@ -39,5 +40,6 @@ app.get("/", (_, res) => {
 });
 
 httpServer.listen(3001, () => {
-    console.log("🚀 http://localhost:3001");
+    // console.log("http://localhost:3001");
+    console.log(process.env.PUBLIC_SOCKET_URL);
 });

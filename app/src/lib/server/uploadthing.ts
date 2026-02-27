@@ -9,7 +9,7 @@ const f = createUploadthing();
 
 
 const handleAuth = async (req: Request) => {
-    
+
     const session = await auth.api.getSession({ headers: req.headers, });
 
     if (!session?.user) throw new Error("Unauthorized");
@@ -27,6 +27,10 @@ export const ourFileRouter = {
             // console.log("User:", metadata.userId);
             // console.log("File URL:", file.ufsUrl);
         }),
+
+    serverBannerImage: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
+        .middleware(async ({ req }) => handleAuth(req))
+        .onUploadComplete(async ({ metadata, file }) => { }),
 
     messageFile: f(["image", "pdf", "video", "image/gif"])
         .middleware(async ({ req }) => handleAuth(req))
