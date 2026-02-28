@@ -21,28 +21,42 @@
         type="channel"
     />
 
+<!--    <ChatMessages-->
+<!--            member={currentMember}-->
+<!--            name={currentChannel.channelName}-->
+<!--            chatId={currentChannel.channelId}-->
+<!--            type="channel"-->
+<!--            apiUrl="/api/messages"-->
+<!--            socketUrl="/api/socket/messages"-->
+<!--            socketQuery={{-->
+<!--                channelId: currentChannel.channelId,-->
+<!--                serverId: currentChannel.serverId,-->
+<!--            }}-->
+<!--            paramKey="channelId"-->
+<!--            paramValue={currentChannel.channelId}-->
+<!--    />-->
+
     <ChatMessages
-            member={currentMember}
-            name={currentChannel.channelName}
-            chatId={currentChannel.channelId}
+            channelId={currentChannel.channelId}
+            channelName={currentChannel.channelName}
+            serverId={currentChannel.serverId}
+            memberId={currentMember.memberId}
             type="channel"
-            apiUrl="/api/messages"
-            socketUrl="/api/socket/messages"
-            socketQuery={{
-                channelId: currentChannel.channelId,
-                serverId: currentChannel.serverId,
-            }}
-            paramKey="channelId"
-            paramValue={currentChannel.channelId}
     />
 
+<!--    <ChatInput-->
+<!--            name={currentChannel.channelName}-->
+<!--            type="channel"-->
+<!--            apiUrl="/api/socket/messages"-->
+<!--            query={{-->
+<!--                channelId: currentChannel.channelId,-->
+<!--                serverId: currentChannel.serverId-->
+<!--            }}-->
+<!--    />-->
     <ChatInput
-            name={currentChannel.channelName}
-            type="channel"
-            apiUrl="/api/socket/messages"
-            query={{
-                channelId: currentChannel.channelId,
-                serverId: currentChannel.serverId
-            }}
+            channelId={currentChannel.channelId}
+            channelName={currentChannel.channelName}
+            serverId={currentChannel.serverId}
+            memberId={currentMember.memberId}
     />
 </div>

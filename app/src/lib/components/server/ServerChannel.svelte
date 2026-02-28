@@ -31,6 +31,7 @@
         onclick={ 
             () => goto(`/servers/${page.params.serverId}/channels/${channel.channelId}`) 
         }
+        data-sveltekit-preload-data="hover"
         class={cn(
             "group pl-2 py-2 pr-4 rounded-md flex items-center gap-x-2 w-full",
             "hover:bg-zinc-700/10 dark:hover:bg-zinc-700/50 transition mb-1",
