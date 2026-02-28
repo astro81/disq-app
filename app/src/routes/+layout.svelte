@@ -2,8 +2,8 @@
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { setUserState } from '$lib/stores/user-state.svelte.ts';
-	import {onDestroy, onMount} from "svelte";
-	import {socketState} from "$lib/stores/socket.svelte.ts";
+	// import {onDestroy, onMount} from "svelte";
+	// import {socketState} from "$lib/stores/socket.svelte.ts";
 	
 	let { children, data } = $props();
 
@@ -17,13 +17,13 @@
 		}
 	});
 
-	onMount(() => {
-		socketState.connect();
-	});
-
-	onDestroy(() => {
-		socketState.disconnect();
-	});
+	// onMount(() => {
+	// 	socketState.connect();
+	// });
+	//
+	// onDestroy(() => {
+	// 	socketState.disconnect();
+	// });
 </script>
 
 <svelte:head>

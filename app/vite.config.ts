@@ -6,6 +6,12 @@ import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
+	build: {
+		rollupOptions: {
+			external: ['bun']
+		}
+	},
+	ssr: { external: ['bun'] },
 	test: {
 		expect: { requireAssertions: true },
 		projects: [

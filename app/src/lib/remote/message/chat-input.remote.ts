@@ -5,6 +5,7 @@ import { db } from '$lib/server/db';
 import { message } from '$lib/server/db/chat-schema';
 import { requireAuth } from '$lib/server/utils/session-checker';
 import { error } from '@sveltejs/kit';
+import { broadcastToClient } from '$lib/server/utils/web-sockets';
 
 export const chatInputSend = form(
 	z.object({
@@ -38,8 +39,30 @@ export const chatInputSend = form(
 				})
 				.returning();
 
+			const messagePayload = {
+				messageContent: content,
+				messageFileUrl: '',
+				memberId: serverMember.memberId,
+				channelId: channelId,
+				messageDeleted: false,
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+				member: {
+					memberId: serverMember.memberId,
+					role: serverMember.role,
+					user: {
+						id: user.id,
+						name: user.name,
+						image: user.image,
+						displayName: user.displayName,
+					}
+				}
+			}
+
+			broadcastToClient(channelId, messagePayload);
+
 			return { success: true, message: newMessage };
-		} catch (error) {
+		} catch (error: any) {
 			console.error('REMOTE_CHAT_INPUT_ERROR:', error);
 			return { success: false, error: error.message || 'Internal error' };
 		}

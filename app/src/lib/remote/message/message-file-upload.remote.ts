@@ -3,7 +3,6 @@ import z from 'zod';
 import { requireAuth } from '$lib/server/utils/session-checker';
 import { db } from '$lib/server/db';
 import { message } from '$lib/server/db/chat-schema';
-import { io as Client } from 'socket.io-client';
 
 export const messageFileUploadRemote = form(
 	z.object({
@@ -41,13 +40,6 @@ export const messageFileUploadRemote = form(
 				channelId: serverChannel.channelId
 			})
 			.returning();
-
-		if (newMessage[0]) {
-			const socketURL = process.env.PUBLIC_SOCKET_URL || "http://localhost:3001";
-			const socket = Client(socketURL, { transports: ["websocket"] });
-			socket.emit("message", { roomId: serverChannel.channelId, message: newMessage[0] });
-			socket.disconnect();
-		}
 
 		return { success: true, message: newMessage[0] };
 	}

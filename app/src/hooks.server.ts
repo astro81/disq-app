@@ -4,8 +4,10 @@ import { building } from '$app/environment';
 
 import { svelteKitHandler } from "better-auth/svelte-kit";
 
-import { auth } from "$lib/server/auth"; 
+import { auth } from "$lib/server/auth";
 import { handleLoginRedirect } from "$lib/server/utils/login-redirect";
+import { randomUUID } from 'node:crypto';
+import { connectedClients } from '$lib/server/utils/web-sockets.ts';
 
 
 const AUTH_ROUTES = ["/login"];
@@ -82,10 +84,45 @@ const protectedRoutesHook: Handle = async ({ event, resolve }) => {
 };
 
 
+const socketHandlerHook: Handle = async ({ event, resolve }) => {
+	const { url, platform, request } = event;
+
+	if (url.pathname === '/ws' && request.headers.get('upgrade')?.toLowerCase() === 'websocket') {
+		if (platform?.server) {
+			const upgraded = platform.server.upgrade(platform.request, {
+				data: {
+					connectionId: randomUUID(),
+					channelId: url.searchParams.get('channelId') || 'default',
+				},
+			});
+
+			if (upgraded) return new Response(null, { status: 101 });
+		}
+	}
+
+	return resolve(event);
+};
+
 export const handle = sequence(
-    authSessionHook,                     // !Must be first
-    sessionLocalsHook,
-    lastPathHook,
-    loginRedirectHook,
-    protectedRoutesHook
+	socketHandlerHook,
+	authSessionHook,                     // !Must be first
+	sessionLocalsHook,
+	lastPathHook,
+	loginRedirectHook,
+	protectedRoutesHook,
 );
+
+
+export const websocket = {
+	async open(ws) {
+		connectedClients.add(ws);
+		console.log(`Client connected: ${ws.data.connectionId}`);
+	},
+
+	message() { },
+
+	close(ws) {
+		connectedClients.delete(ws);
+	}
+
+}
