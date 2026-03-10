@@ -4,30 +4,45 @@
 	import { getMessages, deleteMessage } from '$lib/remote/message/message.remote';
 	import UserAvatar from '$lib/components/modals/UserAvatar.svelte';
 	import { Trash2 } from 'lucide-svelte';
+	import { createHighlighter, type Highlighter } from 'shiki';
 
-	// interface ChatMessageProps {
-	// 	name: string;
-	// 	member: MemberProps;
-	// 	chatId: string;
-	// 	apiUrl: string;
-	// 	socketUrl: string;
-	// 	socketQuery: Record<string, string>;
-	// 	paramKey: 'channelId' | 'conversationId';
-	// 	paramValue: string;
-	// 	type: 'channel' | 'conversation';
-	// }
+	const CODE_PREFIX = ':::code:::';
 
-	// let {
-	// 	name,
-	// 	member,
-	// 	chatId,
-	// 	apiUrl,
-	// 	socketUrl,
-	// 	socketQuery,
-	// 	paramKey,
-	// 	paramValue,
-	// 	type
-	// }: ChatMessageProps = $props();
+	const shikiLanguages = [
+		'javascript',
+		'typescript',
+		'python',
+		'svelte',
+		'rust',
+		'tsx',
+		'html',
+		'css',
+		'c++',
+		'c#',
+		'c',
+		'docker',
+		'json',
+		'jsx',
+		'lua',
+		'nix',
+		'razor'
+	];
+
+	const shikiThemes = [
+		'github-dark',
+		'github-light',
+		'nord',
+		'one-dark-pro',
+		'catppuccin-frappe',
+		'catppuccin-latte',
+		'catppuccin-macchiato',
+		'catppuccin-mocha',
+		'dracula',
+		'dracula-soft',
+		'gruvbox-dark-soft',
+		'kanagawa-dragon',
+		'tokyo-night'
+	];
 
 	interface ChatMessageProps {
 		channelId: string;
@@ -61,6 +76,19 @@
 	let { channelId, channelName, serverId, memberId, type }: ChatMessageProps = $props();
 
 	let messages = $state<ChatMessage[]>([]);
+	let highlighter = $state<Highlighter | null>(null);
+
+	// Initialize Shiki highlighter
+	$effect(() => {
+		const initHighlighter = async () => {
+			const instance = await createHighlighter({
+				themes: shikiThemes,
+				langs: shikiLanguages
+			});
+			highlighter = instance;
+		};
+		initHighlighter();
+	});
 
 	$effect(() => {
 		// Load history
@@ -106,6 +134,33 @@
 
 		await deleteMessage({ messageId, channelId });
 	}
+
+	function isCodeMessage(content: string): boolean {
+		return content.startsWith(CODE_PREFIX);
+	}
+
+	function parseCodeMessage(content: string): { lang: string; theme: string; code: string } | null {
+		if (!content.startsWith(CODE_PREFIX)) return null;
+		try {
+			const parsed = JSON.parse(content.slice(CODE_PREFIX.length));
+			return { lang: parsed.lang, theme: parsed.theme || 'github-dark', code: parsed.code };
+		} catch {
+			return null;
+		}
+	}
+
+	function highlightCode(content: string): string {
+		const parsed = parseCodeMessage(content);
+		if (!parsed || !highlighter) return '';
+		try {
+			return highlighter.codeToHtml(parsed.code, {
+				lang: parsed.lang,
+				theme: parsed.theme
+			});
+		} catch {
+			return `<pre class="p-4 text-red-400">${parsed.code}</pre>`;
+		}
+	}
 </script>
 
 <div class="flex flex-1 flex-col gap-y-4 overflow-y-auto px-4 py-4">
@@ -116,6 +171,7 @@
 	<div class="flex flex-col gap-y-4">
 		{#each messages as message (message.messageId)}
 			{@const isMine = message.memberId === memberId}
+			{@const codeData = !message.messageDeleted ? parseCodeMessage(message.messageContent) : null}
 			<div class="flex w-full {isMine ? 'justify-end' : 'justify-start'} group">
 				<div class="flex max-w-[80%] flex-col {isMine ? 'items-end' : 'items-start'}">
 					<div class="mb-1 flex items-center gap-x-2">
@@ -140,21 +196,73 @@
 						{/if}
 					</div>
 
-					<div
-						class="rounded-2xl px-4 py-2 text-sm shadow-sm {isMine
-							? 'rounded-tr-none bg-indigo-600 text-white'
-							: 'rounded-tl-none bg-zinc-100 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100'} {message.messageDeleted
-							? 'border border-dashed border-zinc-400 opacity-50'
-							: ''}"
-					>
-						{#if message.messageDeleted}
-							<span class="text-xs italic"> This message has been deleted </span>
-						{:else}
+					{#if message.messageDeleted}
+						<!-- Deleted message -->
+						<div
+							class="rounded-2xl border border-dashed border-zinc-400 px-4 py-2 text-sm opacity-50 shadow-sm
+								{isMine
+								? 'rounded-tr-none bg-indigo-600 text-white'
+								: 'rounded-tl-none bg-zinc-100 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100'}"
+						>
+							<span class="text-xs italic">This message has been deleted</span>
+						</div>
+					{:else if codeData}
+						<!-- Code snippet message -->
+						<div
+							class="code-snippet-container w-full overflow-hidden rounded-xl border border-zinc-700 shadow-lg"
+						>
+							<!-- Language badge header -->
+							<div class="flex items-center justify-between bg-zinc-800 px-3 py-1.5">
+								<span class="text-[10px] font-bold tracking-widest text-indigo-400 uppercase">
+									{codeData.lang}
+								</span>
+								<span class="text-[10px] tracking-wider text-zinc-500">
+									{codeData.theme}
+								</span>
+							</div>
+							<!-- Highlighted code -->
+							<div class="shiki-chat-wrapper overflow-x-auto">
+								{#if highlighter}
+									{@html highlightCode(message.messageContent)}
+								{:else}
+									<pre
+										class="bg-[#0d1117] p-4 font-mono text-sm text-zinc-300">{codeData.code}</pre>
+								{/if}
+							</div>
+						</div>
+					{:else}
+						<!-- Regular text message -->
+						<div
+							class="rounded-2xl px-4 py-2 text-sm shadow-sm {isMine
+								? 'rounded-tr-none bg-indigo-600 text-white'
+								: 'rounded-tl-none bg-zinc-100 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100'}"
+						>
 							{message.messageContent}
-						{/if}
-					</div>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/each}
 	</div>
 </div>
+
+<style>
+	:global(.shiki-chat-wrapper pre) {
+		margin: 0;
+		padding: 1rem 1.25rem;
+		font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+		font-size: 13px;
+		line-height: 1.6;
+		tab-size: 2;
+	}
+
+	:global(.shiki-chat-wrapper code) {
+		display: block;
+		min-width: fit-content;
+	}
+
+	.code-snippet-container {
+		min-width: 280px;
+		max-width: 100%;
+	}
+</style>

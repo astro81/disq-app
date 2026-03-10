@@ -11,9 +11,11 @@ export const chatInputSend = form(
 	z.object({
 		content: z.string().min(1, 'Message cannot be empty'),
 		channelId: z.string().min(1),
-		serverId: z.string().min(1)
+		serverId: z.string().min(1),
+		codeLanguage: z.string().optional(),
+		codeTheme: z.string().optional()
 	}),
-	async ({ content, channelId, serverId }) => {
+	async ({ content, channelId, serverId, codeLanguage, codeTheme }) => {
 		try {
 
 			// Check Auth
@@ -28,11 +30,17 @@ export const chatInputSend = form(
 
 			if (!serverMember) error(401, 'Access denied: Not a member of this server');
 
+			// Encode code snippets with prefix
+			let finalContent = content;
+			if (codeLanguage && codeLanguage.trim()) {
+				finalContent = `:::code:::${JSON.stringify({ lang: codeLanguage, theme: codeTheme || 'github-dark', code: content })}`;
+			}
+
 			// Create message in DB
 			const [newMessage] = await db
 				.insert(message)
 				.values({
-					messageContent: content,
+					messageContent: finalContent,
 					messageFileUrl: '', 										// Handle files separately or add to schema if needed
 					memberId: serverMember.memberId,
 					channelId: channelId
@@ -40,7 +48,7 @@ export const chatInputSend = form(
 				.returning();
 
 			const messagePayload = {
-				messageContent: content,
+				messageContent: finalContent,
 				messageFileUrl: '',
 				memberId: serverMember.memberId,
 				channelId: channelId,
