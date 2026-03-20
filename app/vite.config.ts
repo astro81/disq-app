@@ -6,6 +6,10 @@ import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
+	define: {
+		'process.env': {},
+		global: 'globalThis'
+	},
 	build: {
 		rollupOptions: {
 			external: ['bun']
