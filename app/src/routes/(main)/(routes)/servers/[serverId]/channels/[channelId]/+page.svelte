@@ -1,3 +1,5 @@
+<!-- /servers/[serverId]/channels/[channelId]-->
+
 <script lang="ts">
 	import type { PageProps } from './$types';
 

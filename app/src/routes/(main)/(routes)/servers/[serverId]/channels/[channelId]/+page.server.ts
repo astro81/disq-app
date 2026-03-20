@@ -1,3 +1,4 @@
+// /servers/[serverId]/channels/[channelId]
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

@@ -1,90 +1,85 @@
-import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import cors from "cors";
+const PORT: number = parseInt(process.env.WS_PORT ?? '3001');
 
-const app = express();
-app.use(cors());
+// channelId -> Set of connected WebSockets
+const channels = new Map<string, Set<ServerWebSocket<WSData>>>();
 
-const httpServer = createServer(app);
+interface WSData {
+    connectionId: string;
+    channelId: string;
+}
 
-export const io = new Server(httpServer, {
-    cors: {
-        origin: process.env.PUBLIC_APP_URL,
-        methods: ["GET", "POST"]
+const server = Bun.serve<WSData>({
+    port: PORT,
+
+    fetch(req, server) {
+        const url = new URL(req.url);
+
+        // Handle CORS preflight
+        const corsHeaders = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, x-internal-secret',
+        };
+
+        if (req.method === 'OPTIONS') {
+            return new Response(null, { status: 204, headers: corsHeaders });
+        }
+
+        if (url.pathname === '/ws') {
+            const channelId = url.searchParams.get('channelId') ?? 'default';
+            const upgraded = server.upgrade(req, {
+                data: { connectionId: crypto.randomUUID(), channelId },
+                headers: corsHeaders,   // ← pass headers on upgrade
+            });
+            if (upgraded) return undefined;
+            return new Response('WebSocket upgrade failed', { status: 400 });
+        }
+
+        if (url.pathname === '/broadcast' && req.method === 'POST') {
+            const authHeader = req.headers.get('x-internal-secret');
+            if (authHeader !== (process.env.INTERNAL_SECRET ?? 'dev-secret')) {
+                return new Response('Forbidden', { status: 403, headers: corsHeaders });
+            }
+
+            return req.json().then((body: { channelId: string; payload: object }) => {
+                broadcast(body.channelId, body.payload);
+                console.log('[broadcast]', body.channelId, body.payload);
+                return new Response('ok', { headers: corsHeaders });
+            });
+        }
+
+        return new Response('Not found', { status: 404 });
+    },
+
+    websocket: {
+        open(ws) {
+            const { channelId, connectionId } = ws.data;
+            if (!channels.has(channelId)) channels.set(channelId, new Set());
+            channels.get(channelId)!.add(ws);
+            console.log(`[WS] Client connected: ${connectionId} -> channel: ${channelId}`);
+        },
+
+        message(ws, raw) {
+            // Clients don't send messages here — SvelteKit handles that via HTTP.
+            // But you could forward pings, typing indicators, etc. here if needed.
+        },
+
+        close(ws) {
+            const { channelId, connectionId } = ws.data;
+            channels.get(channelId)?.delete(ws);
+            if (channels.get(channelId)?.size === 0) channels.delete(channelId);
+            console.log(`[WS] Client disconnected: ${connectionId}`);
+        },
+    },
+});
+
+function broadcast(channelId: string, payload: object) {
+    const clients = channels.get(channelId);
+    if (!clients) return;
+    const msg = JSON.stringify(payload);
+    for (const client of clients) {
+        client.send(msg);
     }
-});
+}
 
-// Track which voice room each socket is in
-const socketVoiceRooms = new Map<string, string>();
-
-io.on("connection", (socket) => {
-    console.log("Connected:", socket.id);
-
-    socket.emit("status", "connected");
-
-    socket.on("join", (roomId: string) => {
-        socket.join(roomId);
-        console.log(`Socket ${socket.id} joined ${roomId}`);
-    });
-
-    socket.on("message", ({ roomId, message }) => {
-        io.to(roomId).emit("message", message);
-    });
-
-    // Voice Call Events
-    socket.on("join-voice", (roomId: string) => {
-        // Leave any previous voice room first
-        const previousRoom = socketVoiceRooms.get(socket.id);
-        if (previousRoom) {
-            socket.leave(previousRoom);
-            socket.to(previousRoom).emit("user-left", socket.id);
-            console.log(`Socket ${socket.id} auto-left voice channel ${previousRoom}`);
-        }
-
-        socket.join(roomId);
-        socketVoiceRooms.set(socket.id, roomId);
-        console.log(`Socket ${socket.id} joined voice channel ${roomId}`);
-
-        // Get all sockets in the room except the sender
-        const existingUsers = Array.from(io.sockets.adapter.rooms.get(roomId) || [])
-            .filter(id => id !== socket.id);
-
-        // Send existing users to the joining user
-        socket.emit("all-users", existingUsers);
-
-        // Notify others in the room that a new peer joined
-        socket.to(roomId).emit("user-joined", socket.id);
-    });
-
-    socket.on("signal", ({ to, signal }: { to: string; signal: any }) => {
-        io.to(to).emit("signal", { from: socket.id, signal });
-    });
-
-    socket.on("leave-voice", (roomId: string) => {
-        socket.leave(roomId);
-        socketVoiceRooms.delete(socket.id);
-        console.log(`Socket ${socket.id} left voice channel ${roomId}`);
-        socket.to(roomId).emit("user-left", socket.id);
-    });
-
-    socket.on("disconnect", () => {
-        console.log("Disconnected:", socket.id);
-
-        // Notify voice room peers when a socket disconnects unexpectedly
-        const voiceRoom = socketVoiceRooms.get(socket.id);
-        if (voiceRoom) {
-            socket.to(voiceRoom).emit("user-left", socket.id);
-            socketVoiceRooms.delete(socket.id);
-            console.log(`Socket ${socket.id} removed from voice channel ${voiceRoom} on disconnect`);
-        }
-    });
-});
-
-app.get("/", (_, res) => {
-    res.send("Socket.IO server running");
-});
-
-httpServer.listen(3001, () => {
-    console.log(process.env.PUBLIC_SOCKET_URL);
-});
+console.log(`[WS Server] Listening on port ${PORT}`);

@@ -1,4 +1,6 @@
+<!-- ChatMessages.svelte -->
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import ChatWelcome from '$lib/components/chat/ChatWelcome.svelte';
 	import { socketState } from '$lib/stores/socket.svelte';
 	import { getMessages, deleteMessage } from '$lib/remote/message/message.remote';
@@ -78,28 +80,27 @@
 	let messages = $state<ChatMessage[]>([]);
 	let highlighter = $state<Highlighter | null>(null);
 
-	// Initialize Shiki highlighter
-	$effect(() => {
-		const initHighlighter = async () => {
-			const instance = await createHighlighter({
-				themes: shikiThemes,
-				langs: shikiLanguages
-			});
+	onMount(() => {
+		// Initialize Shiki highlighter
+		createHighlighter({ themes: shikiThemes, langs: shikiLanguages }).then((instance) => {
 			highlighter = instance;
-		};
-		initHighlighter();
-	});
+		});
 
-	$effect(() => {
-		// Load history
+		// Load message history
 		getMessages({ channelId }).then((history: any) => {
 			messages = history as ChatMessage[];
 		});
 
+		// WebSocket connection
 		const protocol = window.location.protocol === 'https' ? 'wss' : 'ws';
-		const ws = new WebSocket(`${protocol}://${window.location.host}/ws?channelId=${channelId}`);
+		const wsPort = import.meta.env.VITE_WS_PORT ?? '3001';
+		const wsUrl = `${protocol}://${window.location.hostname}:${wsPort}/ws?channelId=${channelId}`;
+
+		console.log('[WS] Connecting to:', wsUrl);
+		const ws = new WebSocket(wsUrl);
 
 		ws.onopen = () => {
+			console.log('[WS] Connected');
 			socketState.isConnected = true;
 		};
 
@@ -114,17 +115,23 @@
 				return;
 			}
 
-			// Traditional message broadcast
+			// Regular message broadcast
 			const msg = data as ChatMessage;
 			if (msg.channelId === channelId) {
 				messages.push(msg);
 			}
 		};
 
-		ws.onclose = () => {
+		ws.onerror = (e) => {
+			console.error('[WS] Error:', e);
+		};
+
+		ws.onclose = (e) => {
+			console.warn('[WS] Closed:', e.code, e.reason);
 			socketState.isConnected = false;
 		};
 
+		// Cleanup on component destroy
 		return () => ws.close();
 	});
 
@@ -133,10 +140,6 @@
 		if (!confirmed) return;
 
 		await deleteMessage({ messageId, channelId });
-	}
-
-	function isCodeMessage(content: string): boolean {
-		return content.startsWith(CODE_PREFIX);
 	}
 
 	function parseCodeMessage(content: string): { lang: string; theme: string; code: string } | null {
@@ -188,8 +191,8 @@
 
 						{#if isMine && !message.messageDeleted}
 							<button
-								onclick={() => handleDelete(message.messageId)}
-								class="hidden text-zinc-500 transition group-hover:block hover:text-red-500"
+									onclick={() => handleDelete(message.messageId)}
+									class="hidden text-zinc-500 transition group-hover:block hover:text-red-500"
 							>
 								<Trash2 class="size-3" />
 							</button>
@@ -199,7 +202,7 @@
 					{#if message.messageDeleted}
 						<!-- Deleted message -->
 						<div
-							class="rounded-2xl border border-dashed border-zinc-400 px-4 py-2 text-sm opacity-50 shadow-sm
+								class="rounded-2xl border border-dashed border-zinc-400 px-4 py-2 text-sm opacity-50 shadow-sm
 								{isMine
 								? 'rounded-tr-none bg-indigo-600 text-white'
 								: 'rounded-tl-none bg-zinc-100 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100'}"
@@ -209,7 +212,7 @@
 					{:else if codeData}
 						<!-- Code snippet message -->
 						<div
-							class="code-snippet-container w-full overflow-hidden rounded-xl border border-zinc-700 shadow-lg"
+								class="code-snippet-container w-full overflow-hidden rounded-xl border border-zinc-700 shadow-lg"
 						>
 							<!-- Language badge header -->
 							<div class="flex items-center justify-between bg-zinc-800 px-3 py-1.5">
@@ -226,14 +229,14 @@
 									{@html highlightCode(message.messageContent)}
 								{:else}
 									<pre
-										class="bg-[#0d1117] p-4 font-mono text-sm text-zinc-300">{codeData.code}</pre>
+											class="bg-[#0d1117] p-4 font-mono text-sm text-zinc-300">{codeData.code}</pre>
 								{/if}
 							</div>
 						</div>
 					{:else}
 						<!-- Regular text message -->
 						<div
-							class="rounded-2xl px-4 py-2 text-sm shadow-sm {isMine
+								class="rounded-2xl px-4 py-2 text-sm shadow-sm {isMine
 								? 'rounded-tr-none bg-indigo-600 text-white'
 								: 'rounded-tl-none bg-zinc-100 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100'}"
 						>

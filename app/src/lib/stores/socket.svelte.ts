@@ -1,3 +1,4 @@
+// socket.svelte.ts
 export class SocketState {
     isConnected = $state(false);
 }

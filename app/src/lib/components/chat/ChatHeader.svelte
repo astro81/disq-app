@@ -1,3 +1,4 @@
+<!-- ChatHeader.svelte -->
 <script lang="ts">
 	import { Hash } from '@lucide/svelte';
 
