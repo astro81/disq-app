@@ -9,6 +9,8 @@ import { authMiddleware, type AuthVariables } from '@/middleware/auth'
 
 import create from '@/api/servers/create'
 import join from '@/api/servers/join'
+import invite from '@/api/servers/invite'
+
 import { getMembership } from '@/utils/channel-permissions'
 
 const app = new Hono<{ Variables: AuthVariables }>()
@@ -17,6 +19,7 @@ const app = new Hono<{ Variables: AuthVariables }>()
 //! internally protected via authMiddleware
 app.route('/', create)
 app.route('/', join)
+app.route('/invite', invite)
 
 
 // GET /api/servers — all public servers with member counts

@@ -1,0 +1,154 @@
+<script lang="ts">
+	import type { ServerMemberRole, ServerProps } from "$lib/types/server";
+	import Button from "../ui/button/button.svelte";
+
+    import { 
+        ChevronDown, 
+        ChevronRight, 
+        CirclePlus, 
+        LogOut, 
+        Settings, 
+        Trash, 
+        UserPlus, 
+        Users 
+    } from "@lucide/svelte";
+
+
+    import DropdownMenu from "$lib/components/ui/dropdown-menu/dropdown-menu.svelte";
+    import DropdownMenuTrigger from "$lib/components/ui/dropdown-menu/dropdown-menu-trigger.svelte";
+    import DropdownMenuItem from "$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte";
+    import DropdownMenuContent from "$lib/components/ui/dropdown-menu/dropdown-menu-content.svelte";
+    import DropdownMenuSeparator from "$lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte";
+	import InviteMember from "../models/servers/InviteMember.svelte";
+
+    
+    type ServerMemberAllProps = {
+        memberId: string;
+        role: "ADMIN" | "MODERATOR" | "GUEST";
+        userId: string | null;
+        username: string | null;
+        userProfileImage: string | null;
+        userDisplayName: string | null;
+        userEmail: string | null;
+        joinedAt: Date;
+    };
+    
+    interface ServerHeaderProps {
+        currentServer: ServerProps,
+        role: ServerMemberRole,
+        members: ServerMemberAllProps[]
+    }
+
+    // todo: setup current server store
+    let { currentServer, role, members }: ServerHeaderProps = $props();
+
+    const isAdmin = $derived(role === 'ADMIN');
+    const isModerator = $derived(isAdmin || role === 'MODERATOR');
+
+    let isDropdownOpen = $state(false);
+
+    let inviteDialogOpen = $state(false);
+    let isServerEditDialogOpen = $state(false);
+    let isManageMemberDialogOpen = $state(false);
+    let isCreateChannelDialogOpen = $state(false);
+    let isLeaveServerDialogOpen = $state(false);
+    let isDeleteServerDialogOpen = $state(false);
+
+</script>
+
+
+<DropdownMenu bind:open={isDropdownOpen}>
+
+    <div class="relative flex flex-col justify-center items-center">
+        <div class="w-full flex justify-center items-center">
+            <img 
+                src={currentServer.serverBannerImageUrl ?? currentServer.serverImageUrl} 
+                alt={currentServer.serverName}
+                class="object-cover w-full h-full max-h-40 rounded-tl-3xl"
+            >
+        </div>
+
+        <div class="absolute z-30 top-0 left-0 w-full">
+            <DropdownMenuTrigger>
+                {#snippet child({ props })}
+                    <Button {...props}
+                        class="rounded-tl-3xl min-w-full border-none active:border-none focus:border-none
+                            text-foreground-card bg-transparent hover:bg-transparent"
+                        >
+                            <span class="text-base font-medium ">{currentServer.serverName}</span>
+                            {#if !isDropdownOpen}
+                                <ChevronDown class="size-5 ml-auto"/>
+                            {:else}
+                                <ChevronRight class="size-5 ml-auto"/>
+                            {/if}
+                    </Button>
+                {/snippet}
+            </DropdownMenuTrigger>
+        </div>
+    </div>
+
+    <DropdownMenuContent align="end" class="w-56 text-xs font-medium text-black dark:text-neutral-400 space-y-0.5 absolute -translate-y-8 ml-2">
+        {#if isModerator}
+            <DropdownMenuItem 
+                class="text-indigo-600 dark:text-indigo-400 px-3 py-2 cursor-pointer"
+                onclick={() => { inviteDialogOpen = true }}
+                >Invite People
+                <UserPlus class="size-4 ml-auto"/>
+            </DropdownMenuItem>
+        {/if}
+        
+        {#if isAdmin}
+            <DropdownMenuItem 
+                class="px-3 py-2 cursor-pointer"
+                onclick={() => { isServerEditDialogOpen = true }}
+                >Server Settings
+                <Settings class="size-4 ml-auto"/>
+            </DropdownMenuItem>
+        {/if}
+        {#if isAdmin}
+            <DropdownMenuItem 
+                class="px-3 py-2 cursor-pointer"
+                onclick={() => { isManageMemberDialogOpen = true }}
+                >Manage Members
+                <Users class="size-4 ml-auto"/>
+            </DropdownMenuItem>
+        {/if}
+
+        {#if isModerator}
+            <DropdownMenuItem 
+                class="px-3 py-2 cursor-pointer"
+                onclick={() => { isCreateChannelDialogOpen = true }}
+                >Create Channels
+                <CirclePlus class="size-4 ml-auto"/>
+            </DropdownMenuItem>
+        {/if}
+
+        {#if isModerator}
+            <DropdownMenuSeparator />
+        {/if}
+
+        {#if isAdmin}
+            <DropdownMenuItem 
+                class="text-rose-500 px-3 py-2 cursor-pointer"
+                onclick={() => { isDeleteServerDialogOpen = true }}
+                >Delete Server
+                <Trash class="text-rose-500 size-4 ml-auto"/>
+            </DropdownMenuItem>
+        {/if}
+
+        {#if !isAdmin}
+            <DropdownMenuItem 
+                class="text-rose-500 px-3 py-2 cursor-pointer"
+                onclick={() => { isLeaveServerDialogOpen = true }}
+                >Leave Server
+                <LogOut class="text-rose-500 size-4 ml-auto"/>
+            </DropdownMenuItem> 
+        {/if}
+            
+    </DropdownMenuContent>
+</DropdownMenu>
+
+<InviteMember bind:inviteDialogOpen {currentServer}/>
+
+
+

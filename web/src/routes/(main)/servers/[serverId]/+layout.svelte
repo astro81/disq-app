@@ -12,7 +12,7 @@
 
 
 {#if currentServer}
-    <div class="h-full">
+    <div class="h-full ml-2">
         <div class="hidden fixed md:flex h-full w-60 z-20 flex-col inset-y-0">
             <ServerSidebar 
                 {currentServer}
