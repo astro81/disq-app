@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ServerMemberRole, ServerProps } from "$lib/types/server";
+	import type { MemberProps, ServerMemberRole, ServerProps } from "$lib/types/server";
 	import Button from "../ui/button/button.svelte";
 
     import { 
@@ -24,6 +24,7 @@
 	import CreateChannel from "../models/channels/CreateChannel.svelte";
 	import LeaveServer from "../models/servers/LeaveServer.svelte";
 	import DeleteServer from "../models/servers/DeleteServer.svelte";
+	import ManageMember from "../models/servers/ManageMember.svelte";
 
     
     type ServerMemberAllProps = {
@@ -40,11 +41,12 @@
     interface ServerHeaderProps {
         currentServer: ServerProps,
         role: ServerMemberRole,
-        members: ServerMemberAllProps[]
+        members: ServerMemberAllProps[],
+        currentMember: MemberProps
     }
 
     // todo: setup current server store
-    let { currentServer, role, members }: ServerHeaderProps = $props();
+    let { currentServer, role, members, currentMember }: ServerHeaderProps = $props();
 
     const isAdmin = $derived(role === 'ADMIN');
     const isModerator = $derived(isAdmin || role === 'MODERATOR');
@@ -162,3 +164,5 @@
 
 <LeaveServer bind:isLeaveServerDialogOpen {currentServer}/>
 <DeleteServer bind:isDeleteServerDialogOpen {currentServer}/>
+
+<ManageMember bind:isManageMemberDialogOpen {currentServer} {members} {currentMember}/>

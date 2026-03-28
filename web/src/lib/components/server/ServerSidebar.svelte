@@ -36,7 +36,7 @@
 
 <div class="max-w-60 flex flex-col size-full text-primary dark:bg-[#2b2d31] bg-[#f2f3f5] rounded-tl-3xl">
     
-    <ServerHeader {currentServer} {role} members={currentServerMembersList}/>
+    <ServerHeader {currentServer} {role} members={currentServerMembersList} {currentMember}/>
 
 
     <ScrollArea class="flex-1 px-3">

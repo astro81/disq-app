@@ -13,6 +13,7 @@ import invite from '@/api/servers/invite'
 import update from '@/api/servers/update'
 import leave from '@/api/servers/leave'
 import remove from '@/api/servers/remove'
+import member from '@/api/servers/member'
 
 import { getMembership } from '@/utils/channel-permissions'
 
@@ -26,7 +27,7 @@ app.route('/invite', invite)
 app.route('/update', update)
 app.route('/leave', leave)
 app.route('/remove', remove)
-
+app.route('/', member)
 
 // GET /api/servers — all public servers with member counts
 app.get('/', async (c) => {
