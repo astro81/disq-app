@@ -11,6 +11,8 @@ import create from '@/api/servers/create'
 import join from '@/api/servers/join'
 import invite from '@/api/servers/invite'
 import update from '@/api/servers/update'
+import leave from '@/api/servers/leave'
+import remove from '@/api/servers/remove'
 
 import { getMembership } from '@/utils/channel-permissions'
 
@@ -22,6 +24,8 @@ app.route('/', create)
 app.route('/', join)
 app.route('/invite', invite)
 app.route('/update', update)
+app.route('/leave', leave)
+app.route('/remove', remove)
 
 
 // GET /api/servers — all public servers with member counts

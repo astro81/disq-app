@@ -58,6 +58,7 @@
 		"@uploadthing/svelte": "^7.3.3",
 		"firebase": "^12.11.0",
 		"mode-watcher": "^1.1.0",
-		"shiki": "^4.0.2"
+		"shiki": "^4.0.2",
+		"zod": "^4.3.6"
 	}
 }

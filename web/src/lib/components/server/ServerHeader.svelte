@@ -22,6 +22,8 @@
 	import InviteMember from "../models/servers/InviteMember.svelte";
 	import ServerSettings from "../models/servers/ServerSettings.svelte";
 	import CreateChannel from "../models/channels/CreateChannel.svelte";
+	import LeaveServer from "../models/servers/LeaveServer.svelte";
+	import DeleteServer from "../models/servers/DeleteServer.svelte";
 
     
     type ServerMemberAllProps = {
@@ -158,3 +160,5 @@
 
 <CreateChannel bind:isCreateChannelDialogOpen {currentServerId}/>
 
+<LeaveServer bind:isLeaveServerDialogOpen {currentServer}/>
+<DeleteServer bind:isDeleteServerDialogOpen {currentServer}/>
