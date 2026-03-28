@@ -22,7 +22,7 @@
 
     interface CreateChannelProps {
         isCreateChannelDialogOpen: boolean;
-        channelType: ServerChannelType;
+        channelType?: ServerChannelType;
         currentServerId: string;
     }
 

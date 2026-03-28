@@ -20,6 +20,8 @@
     import DropdownMenuContent from "$lib/components/ui/dropdown-menu/dropdown-menu-content.svelte";
     import DropdownMenuSeparator from "$lib/components/ui/dropdown-menu/dropdown-menu-separator.svelte";
 	import InviteMember from "../models/servers/InviteMember.svelte";
+	import ServerSettings from "../models/servers/ServerSettings.svelte";
+	import CreateChannel from "../models/channels/CreateChannel.svelte";
 
     
     type ServerMemberAllProps = {
@@ -44,6 +46,9 @@
 
     const isAdmin = $derived(role === 'ADMIN');
     const isModerator = $derived(isAdmin || role === 'MODERATOR');
+
+    let serverName = $derived(currentServer.serverName);
+    let currentServerId = $derived(currentServer.serverId);
 
     let isDropdownOpen = $state(false);
 
@@ -72,10 +77,10 @@
             <DropdownMenuTrigger>
                 {#snippet child({ props })}
                     <Button {...props}
-                        class="rounded-tl-3xl min-w-full border-none active:border-none focus:border-none
+                        class="rounded-tl-3xl min-w-full border-none active:border-none focus:border-none w-60
                             text-foreground-card bg-transparent hover:bg-transparent"
                         >
-                            <span class="text-base font-medium ">{currentServer.serverName}</span>
+                            <span class="text-base font-medium overflow-hidden">{serverName}</span>
                             {#if !isDropdownOpen}
                                 <ChevronDown class="size-5 ml-auto"/>
                             {:else}
@@ -149,6 +154,7 @@
 </DropdownMenu>
 
 <InviteMember bind:inviteDialogOpen {currentServer}/>
+<ServerSettings bind:isServerEditDialogOpen {currentServer}/>
 
-
+<CreateChannel bind:isCreateChannelDialogOpen {currentServerId}/>
 
