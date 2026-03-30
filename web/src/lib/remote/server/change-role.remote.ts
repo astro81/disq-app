@@ -3,6 +3,7 @@ import { command, getRequestEvent } from '$app/server';
 import { API_URL } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
+import { getCurrentMember, getCurrentMemberList } from '../member/current-member.remote';
 
 export const changeMemberRole = command(
     z.object({
@@ -35,7 +36,8 @@ export const changeMemberRole = command(
             throw error(res.status, data?.message ?? 'Failed to change member role');
         }
 
-        // getServerMembersList({ serverId }).refresh();
+        await getCurrentMember({ serverId }).refresh();
+        await getCurrentMemberList({ serverId }).refresh();
 
         return data.message as string;
     }

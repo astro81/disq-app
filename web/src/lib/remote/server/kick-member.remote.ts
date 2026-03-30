@@ -3,6 +3,8 @@ import { command, getRequestEvent } from '$app/server';
 import { API_URL } from '$env/static/private';
 import { error, redirect } from '@sveltejs/kit';
 import { z } from 'zod';
+import { getCurrentMember, getCurrentMemberList } from '../member/current-member.remote';
+import { getPublicServers } from './discover.remote';
 
 export const kickServerMember = command(
     z.object({
@@ -32,7 +34,9 @@ export const kickServerMember = command(
             throw error(res.status, data?.message ?? 'Failed to kick member');
         }
 
-        // getServerMembersList({ serverId }).refresh();
+        await getPublicServers().refresh();
+        await getCurrentMember({ serverId }).refresh();
+        await getCurrentMemberList({ serverId }).refresh();
 
         return data.message as string;
     }

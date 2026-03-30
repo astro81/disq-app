@@ -2,23 +2,18 @@
 import { redirect } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
-import { API_URL } from '$env/static/private'
+import { getChannel } from '$lib/remote/channel/current-channel.remote'
 
-export const load: PageServerLoad = async ({ params, fetch, cookies, parent }) => {
+export const load: PageServerLoad = async ({ params, parent }) => {
     const { serverId, channelId } = params
     const { currentServerChannelList, currentMember } = await parent()
 
-    const accessToken = cookies.get('access_token')
-    const headers = { Authorization: `Bearer ${accessToken}` }
 
     const fetchChannel = async (channelId: string) => {
-        const res = await fetch(`${API_URL}/api/channels/${channelId}`, { headers })
-
-        if (res.status === 403) return null  // no access — caller handles redirect
-        if (!res.ok) return null
-
-        return res.json()
+        const channel = await getChannel({ channelId });
+        return channel
     }
+
 
     // Resolve streamed promises from layout
     const [channelList, member] = await Promise.all([

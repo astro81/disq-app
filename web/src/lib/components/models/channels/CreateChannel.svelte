@@ -19,6 +19,7 @@
     import SelectTrigger from "$lib/components/ui/select/select-trigger.svelte";
     import SelectContent from "$lib/components/ui/select/select-content.svelte";
     import SelectItem from "$lib/components/ui/select/select-item.svelte";
+	import { createChannel } from "$lib/remote/channel/current-channel.remote";
 
     interface CreateChannelProps {
         isCreateChannelDialogOpen: boolean;
@@ -79,30 +80,21 @@
         isLoading = true;
 
         try {
-            const res = await fetch(`/api/channels`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    channelName: channelName.trim(),
-                    channelType: selectValue,
-                    serverId: currentServerId,
-                    isPrivateChannel: isPrivate,
-                }),
+            await createChannel({
+                channelName: channelName.trim(),
+                channelType: selectValue,
+                serverId: currentServerId,
+                isPrivateChannel: isPrivate,
             });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                if (data.field === 'channelName') channelNameError = data.error;
-                else globalError = data.error ?? 'Something went wrong';
-                return;
-            }
 
             await invalidateAll();
             reset();
-            isCreateChannelDialogOpen = false;
-        } catch {
-            globalError = 'Network error, please try again';
+            isCreateChannelDialogOpen = false;            
+        } catch (e: any) {
+            const msg = e?.message ?? 'Something went wrong';
+            // surface field-level errors if the backend sends a `field` hint
+            if (e?.field === 'channelName') channelNameError = msg;
+            else globalError = msg;
         } finally {
             isLoading = false;
         }

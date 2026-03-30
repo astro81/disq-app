@@ -1,13 +1,26 @@
 <script lang="ts">
     import type { PageProps } from './$types'
-    import { enhance } from '$app/forms'
-    import { Maximize2, Users } from '@lucide/svelte'
+    import { Maximize2, Users, Search } from '@lucide/svelte'
     import { Button } from '$lib/components/ui/button/index.js'
+	import { joinServer } from '$lib/remote/server/discover.remote';
 
-    let { data, form }: PageProps = $props()
+    let { data }: PageProps = $props()
 
     let servers = $derived(data.servers)
     let joinedServerIds = $derived(data.joinedServerIds)
+
+    let searchQuery = $state('')
+    let joinError = $state<string | null>(null)
+    let joiningId = $state<string | null>(null)
+
+    let filteredServers = $derived(
+        searchQuery.trim() === ''
+            ? servers
+            : servers.filter(s =>
+                s.serverName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (s.serverDescription ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+            )
+    )
 
     let isPopupOpen = $state(false)
     let popupPosition = $state({ x: 0, y: 0 })
@@ -30,6 +43,19 @@
     function closePopup() {
         isPopupOpen = false
         selectedServer = null
+        joinError = null
+    }
+
+    async function handleJoin(serverId: string) {
+        joiningId = serverId
+        joinError = null
+        try {
+            await joinServer({ serverId })
+        } catch (e: any) {
+            joinError = e?.message ?? 'Failed to join server'
+        } finally {
+            joiningId = null
+        }
     }
 
     function formatDate(date: string) {
@@ -49,17 +75,29 @@
 
         <h1 class="text-5xl font-extrabold uppercase mb-10">Find your community</h1>
 
-        {#if form?.error}
-            <p class="text-sm text-destructive mb-6">{form.error}</p>
-        {/if}
+        <!-- Search bar -->
+        <div class="relative mb-8 max-w-md min-w-full">
+            <Search class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+            <input
+                type="text"
+                placeholder="Search servers..."
+                bind:value={searchQuery}
+                class="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-background text-sm
+                       placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+        </div>
 
         {#if servers.length === 0}
             <p class="text-muted-foreground">No public servers yet. Be the first to create one!</p>
+        {:else if filteredServers.length === 0}
+            <p class="text-muted-foreground">No servers match "<span class="text-foreground">{searchQuery}</span>".</p>
         {:else}
-            <h2 class="text-xl font-medium mb-6">Featured Servers</h2>
+            <h2 class="text-xl font-medium mb-6">
+                {searchQuery.trim() ? `Results for "${searchQuery}"` : 'Featured Servers'}
+            </h2>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {#each servers as server (server.serverId)}
+                {#each filteredServers as server (server.serverId)}
                     <div class="relative h-80 outline outline-border rounded-lg group overflow-hidden flex flex-col">
 
                         <button
@@ -130,23 +168,23 @@
                 {selectedServer.serverDescription ?? 'No description available.'}
             </p>
 
-            <form
-                method="POST"
-                action="?/join"
-                use:enhance={() => async ({ update }) => {
-                    await update()
-                    closePopup()
-                }}
+            {#if joinError}
+                <p class="text-sm text-destructive mb-3">{joinError}</p>
+            {/if}
+
+            <Button
+                onclick={() => handleJoin(selectedServer!.serverId)}
+                class="w-full bg-chart-2 hover:bg-chart-2/90 font-semibold"
+                disabled={joinedServerIds.includes(selectedServer.serverId) || joiningId === selectedServer.serverId}
             >
-                <input type="hidden" name="serverId" value={selectedServer.serverId} />
-                <Button
-                    type="submit"
-                    class="w-full bg-chart-2 hover:bg-chart-2/90 font-semibold"
-                    disabled={joinedServerIds.includes(selectedServer.serverId)}
-                >
-                    {joinedServerIds.includes(selectedServer.serverId) ? 'Already Joined' : 'Join Server'}
-                </Button>
-            </form>
+                {#if joiningId === selectedServer.serverId}
+                    Joining…
+                {:else if joinedServerIds.includes(selectedServer.serverId)}
+                    Already Joined
+                {:else}
+                    Join Server
+                {/if}
+            </Button>
         </div>
     </div>
 {/if}

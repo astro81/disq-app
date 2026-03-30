@@ -18,6 +18,7 @@
     import Field from '$lib/components/ui/field/field.svelte';
     import FieldLabel from '$lib/components/ui/field/field-label.svelte';
 	import Switch from '$lib/components/ui/switch/switch.svelte';
+	import { updateServer } from '$lib/remote/server/server-settings.remote';
 
 
     let {
@@ -94,50 +95,59 @@
         removeBanner = true;
     }
 
+    // File to base64 string
+    async function fileToBase64(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve((reader.result as string).split(',')[1])
+            reader.onerror = reject
+            reader.readAsDataURL(file)
+        })
+    }
+
     async function handleSubmit() {
-        errorMsg  = null;
-        isLoading = true;
+        errorMsg = null
+        isLoading = true
 
         try {
-            const form = new FormData();
-
-            if (serverName.trim()) form.append('serverName', serverName.trim());
-            if (serverDescription !== undefined) form.append('serverDescription', serverDescription);
-
-            form.append('isPrivateServer', isPrivateServer.toString());
-
-            if (removeIcon) form.append('removeImage', 'true');
-            else if (pendingIconFile) form.append('serverImage', pendingIconFile);
-
-            if (removeBanner) form.append('removeBanner', 'true');
-            else if (pendingBannerFile) form.append('serverBannerImage', pendingBannerFile);
-
-            const res = await fetch(`/api/servers/update/${currentServer.serverId}`, {
-                method: 'PATCH',
-                body: form,
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                errorMsg = data.error ?? 'Failed to update server settings.';
-                return;
+            const payload: Parameters<typeof updateServer>[0] = {
+                serverId: currentServer.serverId,
+                serverName: serverName.trim() || undefined,
+                serverDescription,
+                isPrivateServer,
+                removeImage: removeIcon || undefined,
+                removeBanner: removeBanner || undefined,
             }
 
-            currentServer.serverName = data.server.serverName;
-            currentServer.serverDescription = data.server.serverDescription;
-            
-            currentServer.isPrivateServer = data.server.isPrivateServer;
+            if (pendingIconFile) {
+                payload.serverImage = {
+                    data: await fileToBase64(pendingIconFile),
+                    mimeType: pendingIconFile.type,
+                    fileName: pendingIconFile.name,
+                }
+            }
 
-            currentServer.serverImageUrl = data.server.serverImageUrl;
-            currentServer.serverBannerImageUrl = data.server.serverBannerImageUrl;
+            if (pendingBannerFile) {
+                payload.serverBannerImage = {
+                    data: await fileToBase64(pendingBannerFile),
+                    mimeType: pendingBannerFile.type,
+                    fileName: pendingBannerFile.name,
+                }
+            }
 
-            isServerEditDialogOpen = false;
-        } catch (err) {
-            console.error('ServerSettings submit error:', err);
-            errorMsg = 'Something went wrong. Please try again.';
+            const { server } = await updateServer(payload)
+
+            currentServer.serverName = server.serverName
+            currentServer.serverDescription = server.serverDescription
+            currentServer.isPrivateServer = server.isPrivateServer
+            currentServer.serverImageUrl = server.serverImageUrl
+            currentServer.serverBannerImageUrl = server.serverBannerImageUrl
+
+            isServerEditDialogOpen = false
+        } catch (e: any) {
+            errorMsg = e?.message ?? 'Something went wrong. Please try again.'
         } finally {
-            isLoading = false;
+            isLoading = false
         }
     }
 </script>

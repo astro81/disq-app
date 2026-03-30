@@ -2,6 +2,9 @@ import { command, getRequestEvent } from "$app/server";
 import { API_URL } from "$env/static/private";
 import { error, redirect } from "@sveltejs/kit";
 import z from "zod";
+import { getCurrentServer } from "./current-server.remote";
+import { getPublicServers } from "./discover.remote";
+import { getCurrentMember, getCurrentMemberList } from "../member/current-member.remote";
 
 export const removeServer = command(
     z.object({
@@ -25,6 +28,11 @@ export const removeServer = command(
         if (!res.ok) {
             throw error(res.status, data?.message ?? "Failed to delete server");
         }
+
+        await getCurrentServer({ serverId }).refresh();
+        await getPublicServers().refresh();
+        await getCurrentMember({ serverId }).refresh();
+        await getCurrentMemberList({ serverId }).refresh();
 
         return data.message as string;
     }

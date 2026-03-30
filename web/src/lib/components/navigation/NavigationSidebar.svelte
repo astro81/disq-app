@@ -19,7 +19,7 @@
 </script>
 <div class="space-y-4 flex flex-col items-center h-full text-primary w-full dark:bg-[#1e1f22] bg-sidebar-border py-3">
 
-	<NavigationLink href="/servers/@me" label="Direct Messages">
+	<NavigationLink href="/servers/@me" label="Me">
         {#snippet icon()}
             <UserRound size="25" />
         {/snippet}
@@ -27,7 +27,7 @@
 
     <CreateServer />
 
-	<NavigationLink href="/servers/discovery" label="Compass">
+	<NavigationLink href="/servers/discovery" label="Explore">
         {#snippet icon()}
             <Compass size="25" />
         {/snippet}

@@ -25,6 +25,8 @@
 	import LeaveServer from "../models/servers/LeaveServer.svelte";
 	import DeleteServer from "../models/servers/DeleteServer.svelte";
 	import ManageMember from "../models/servers/ManageMember.svelte";
+	import { getCurrentServer } from "$lib/remote/server/current-server.remote";
+	import { page } from "$app/state";
 
     
     type ServerMemberAllProps = {
@@ -45,14 +47,15 @@
         currentMember: MemberProps
     }
 
-    // todo: setup current server store
     let { currentServer, role, members, currentMember }: ServerHeaderProps = $props();
+
+    let currServer = $derived(await getCurrentServer({ serverId: page.params.serverId ?? "" }));
 
     const isAdmin = $derived(role === 'ADMIN');
     const isModerator = $derived(isAdmin || role === 'MODERATOR');
 
-    let serverName = $derived(currentServer.serverName);
-    let currentServerId = $derived(currentServer.serverId);
+    let serverName = $derived(currServer.serverName);
+    let currentServerId = $derived(currServer.serverId);
 
     let isDropdownOpen = $state(false);
 
@@ -71,9 +74,9 @@
     <div class="relative flex flex-col justify-center items-center">
         <div class="w-full flex justify-center items-center">
             <img 
-                src={currentServer.serverBannerImageUrl ?? currentServer.serverImageUrl} 
-                alt={currentServer.serverName}
-                class="object-cover w-full h-full max-h-40 rounded-tl-3xl"
+                src={currServer.serverBannerImageUrl ?? currServer.serverImageUrl} 
+                alt={currServer.serverName}
+                class="object-cover w-full h-full max-h-40 min-h-38 rounded-tl-3xl"
             >
         </div>
 
@@ -157,12 +160,12 @@
     </DropdownMenuContent>
 </DropdownMenu>
 
-<InviteMember bind:inviteDialogOpen {currentServer}/>
-<ServerSettings bind:isServerEditDialogOpen {currentServer}/>
+<InviteMember bind:inviteDialogOpen currentServer={currServer}/>
+<ServerSettings bind:isServerEditDialogOpen currentServer={currServer}/>
 
-<CreateChannel bind:isCreateChannelDialogOpen {currentServerId}/>
+<CreateChannel bind:isCreateChannelDialogOpen currentServerId={currentServerId}/>
 
-<LeaveServer bind:isLeaveServerDialogOpen {currentServer}/>
-<DeleteServer bind:isDeleteServerDialogOpen {currentServer}/>
+<LeaveServer bind:isLeaveServerDialogOpen currentServer={currServer}/>
+<DeleteServer bind:isDeleteServerDialogOpen currentServer={currServer}/>
 
-<ManageMember bind:isManageMemberDialogOpen {currentServer} {members} {currentMember}/>
+<ManageMember bind:isManageMemberDialogOpen currentServer={currServer} {members} {currentMember}/>

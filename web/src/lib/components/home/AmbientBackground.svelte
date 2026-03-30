@@ -10,48 +10,88 @@
 	let orb2: HTMLDivElement;
 	let orb3: HTMLDivElement;
 	let liquid: HTMLDivElement;
-	let particles: HTMLDivElement;
 	let grid: HTMLDivElement;
 	let ctx: gsap.Context;
 
-	// Defined outside gsap.context so we can remove it in onDestroy
-	function handleMouseMove(e: MouseEvent) {
-		const { clientX, clientY } = e;
-		const centerX = window.innerWidth / 2;
-		const centerY = window.innerHeight / 2;
-		const moveX = (clientX - centerX) / 60;
-		const moveY = (clientY - centerY) / 60;
-
-		gsap.to(orb1, {
-			x: `+=${moveX * 0.4}`,
-			y: `+=${moveY * 0.4}`,
-			duration: 2,
-			ease: 'power2.out',
-			overwrite: 'auto'
-		});
-
-		gsap.to(orb2, {
-			x: `+=${moveX * 0.25}`,
-			y: `+=${moveY * 0.25}`,
-			duration: 2.5,
-			ease: 'power2.out',
-			overwrite: 'auto'
-		});
-
-		gsap.to(orb3, {
-			x: `+=${moveX * 0.15}`,
-			y: `+=${moveY * 0.15}`,
-			duration: 3,
-			ease: 'power2.out',
-			overwrite: 'auto'
-		});
+	// Particle system
+	interface Particle {
+		id: number;
+		width: number;
+		height: number;
+		left: number;
+		top: number;
+		blur: number;
+		opacity: number;
+		xMove: number;
+		yMove: number;
+		duration: number;
+		delay: number;
 	}
 
+	let particles: Particle[] = [];
+	let particleAnimations: gsap.core.Tween[] = [];
+
+	let handleMouseMove: ((e: MouseEvent) => void) | undefined;
+
+	// Generate particles on mount (client-side only)
 	onMount(() => {
-		// Guard: wait a tick to ensure all bind:this refs are resolved
-		if (!container || !orb1 || !orb2 || !orb3 || !liquid || !particles || !grid) {
+		// Generate 40 particles
+		const newParticles: Particle[] = [];
+		for (let i = 0; i < 40; i++) {
+			newParticles.push({
+				id: i,
+				width: gsap.utils.random(2, 5),
+				height: gsap.utils.random(2, 5),
+				left: gsap.utils.random(0, 100),
+				top: gsap.utils.random(0, 100),
+				blur: gsap.utils.random(0, 1),
+				opacity: gsap.utils.random(0.2, 0.5),
+				xMove: gsap.utils.random(-50, 50),
+				yMove: gsap.utils.random(-200, -400),
+				duration: gsap.utils.random(8, 15),
+				delay: gsap.utils.random(0, 5)
+			});
+		}
+		particles = newParticles;
+	});
+
+	// Animate particles after they're rendered
+	onMount(() => {
+		if (!container || !orb1 || !orb2 || !orb3 || !liquid || !grid) {
 			return;
 		}
+
+		handleMouseMove = (e: MouseEvent) => {
+			const { clientX, clientY } = e;
+			const centerX = window.innerWidth / 2;
+			const centerY = window.innerHeight / 2;
+			const moveX = (clientX - centerX) / 60;
+			const moveY = (clientY - centerY) / 60;
+
+			gsap.to(orb1, {
+				x: `+=${moveX * 0.4}`,
+				y: `+=${moveY * 0.4}`,
+				duration: 2,
+				ease: 'power2.out',
+				overwrite: 'auto'
+			});
+
+			gsap.to(orb2, {
+				x: `+=${moveX * 0.25}`,
+				y: `+=${moveY * 0.25}`,
+				duration: 2.5,
+				ease: 'power2.out',
+				overwrite: 'auto'
+			});
+
+			gsap.to(orb3, {
+				x: `+=${moveX * 0.15}`,
+				y: `+=${moveY * 0.15}`,
+				duration: 3,
+				ease: 'power2.out',
+				overwrite: 'auto'
+			});
+		};
 
 		ctx = gsap.context(() => {
 			// Floating orb animations
@@ -98,40 +138,48 @@
 				ease: 'none'
 			});
 
-			// Create particles
-			for (let i = 0; i < 40; i++) {
-				const particle = document.createElement('div');
-				particle.style.cssText = `
-					position: absolute;
-					width: ${gsap.utils.random(2, 5)}px;
-					height: ${gsap.utils.random(2, 5)}px;
-					background: oklch(0.7 0.15 160 / ${gsap.utils.random(0.2, 0.5)});
-					border-radius: 50%;
-					left: ${gsap.utils.random(0, 100)}%;
-					top: ${gsap.utils.random(0, 100)}%;
-					filter: blur(${gsap.utils.random(0, 1)}px);
-				`;
-				particles.appendChild(particle);
+			// Animate each particle
+			particleAnimations = particles.map((particle) => {
+				const particleElement = document.getElementById(`particle-${particle.id}`);
+				if (!particleElement) return null;
 
-				gsap.to(particle, {
-					y: gsap.utils.random(-200, -400),
-					x: gsap.utils.random(-50, 50),
+				return gsap.to(particleElement, {
+					y: particle.yMove,
+					x: particle.xMove,
 					opacity: 0,
-					duration: gsap.utils.random(8, 15),
+					duration: particle.duration,
 					repeat: -1,
-					delay: gsap.utils.random(0, 5),
+					delay: particle.delay,
 					ease: 'none',
 					onRepeat: () => {
-						gsap.set(particle, {
+						// Reset particle position and properties
+						gsap.set(particleElement, {
 							y: 0,
 							x: 0,
 							opacity: gsap.utils.random(0.2, 0.5),
 							left: `${gsap.utils.random(0, 100)}%`,
 							top: `${gsap.utils.random(80, 120)}%`
 						});
+						
+						// Update the particle's data for the next cycle
+						const newXMove = gsap.utils.random(-50, 50);
+						const newYMove = gsap.utils.random(-200, -400);
+						const newDuration = gsap.utils.random(8, 15);
+						
+						// Restart animation with new values
+						gsap.killTweensOf(particleElement);
+						gsap.to(particleElement, {
+							y: newYMove,
+							x: newXMove,
+							opacity: 0,
+							duration: newDuration,
+							repeat: -1,
+							ease: 'none',
+							overwrite: true
+						});
 					}
 				});
-			}
+			}).filter(Boolean);
 
 			// Grid subtle animation
 			gsap.to(grid, {
@@ -182,7 +230,11 @@
 	});
 
 	onDestroy(() => {
-		window.removeEventListener('mousemove', handleMouseMove);
+		if (handleMouseMove) {
+			window.removeEventListener('mousemove', handleMouseMove);
+		}
+		// Kill all particle animations
+		particleAnimations.forEach(anim => anim?.kill());
 		ctx?.revert();
 	});
 </script>
@@ -212,8 +264,23 @@
 		style="background: radial-gradient(circle, oklch(0.6 0.12 280 / 0.4) 0%, oklch(0.6 0.12 280 / 0.08) 40%, transparent 70%); filter: blur(90px);"
 	></div>
 
-	<!-- Floating particles -->
-	<div bind:this={particles} class="absolute inset-0"></div>
+	<!-- Floating particles - Svelte-friendly rendering -->
+	<div class="absolute inset-0">
+		{#each particles as particle (particle.id)}
+			<div
+				id={`particle-${particle.id}`}
+				class="absolute rounded-full"
+				style="
+					width: {particle.width}px;
+					height: {particle.height}px;
+					background: oklch(0.7 0.15 160 / {particle.opacity});
+					left: {particle.left}%;
+					top: {particle.top}%;
+					filter: blur({particle.blur}px);
+				"
+			></div>
+		{/each}
+	</div>
 
 	<!-- Subtle animated grid -->
 	<div
