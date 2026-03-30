@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { prettyJSON } from 'hono/pretty-json'
 import { logger } from "hono/logger"
+import { cors } from 'hono/cors'
 
 import { websocket } from 'hono/bun'
 
@@ -15,6 +16,12 @@ import attachments from '@/api/attachments'
 import ws from '@/api/ws'
 
 const app = new Hono()
+
+
+app.use('*', cors({
+  origin: [process.env.FRONTEND_URL ?? "disq-app.vercel.app"],
+  credentials: true,
+}))
 
 
 app.use(prettyJSON({ space: 4 })) 
