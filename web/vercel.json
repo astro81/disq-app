@@ -1,0 +1,11 @@
+{
+  "buildCommand": "bun run build",
+  "outputDirectory": "build",
+  "devCommand": "bun run dev",
+  "installCommand": "bun install",
+  "framework": "sveltekit",
+  "regions": ["iad1"],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
