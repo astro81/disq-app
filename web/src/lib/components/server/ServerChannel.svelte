@@ -3,36 +3,34 @@
 	import { resolve } from "$app/paths";
     import type { Route } from "./$types"; 
 
-	import type { ChannelProps, ServerMemberRole } from "$lib/types/server";
+	import type { ChannelProps, MemberProps, ServerMemberRole } from "$lib/types/server";
 	
     import { cn } from "$lib/utils";
 	
-    import { Hash, Lock, Mic, Video } from "@lucide/svelte";
+    import { Hash, Lock, Mic, SquarePen, Trash, Video } from "@lucide/svelte";
 
-    // import DeleteChannel from "$lib/components/modals/channels/DeleteChannel.svelte";
-	// import EditChannel from "$lib/components/modals/channels/EditChannel.svelte";
 
-	// import ActionTooltip from "$lib/components/navigation/ActionTooltip.svelte";
+	import ActionTooltip from "$lib/components/navigation/ActionTooltip.svelte";
+	import EditChannel from "../models/channels/EditChannel.svelte";
+	import DeleteChannel from "../models/channels/DeleteChannel.svelte";
 
 
     interface ServerChannelProps {
         channel: ChannelProps;
         role?: ServerMemberRole;
+        members: MemberProps[];
     }
 
-    let { channel, role }: ServerChannelProps = $props();
+    let { channel, role, members }: ServerChannelProps = $props();
 
     let channelHref = $derived(`/servers/${page.params.serverId}/channels/${channel.channelId}` as Route);
 
-    // let isEditChannelDialogOpen = $state(false);
-    // let isDeleteChannelDialogOpen = $state(false);
+    let isEditChannelDialogOpen = $state(false);
+    let isDeleteChannelDialogOpen = $state(false);
 </script>
 
 <div>
     <a 
-        // onclick={ 
-        //     () => goto(`/servers/${page.params.serverId}/channels/${channel.channelId}`) 
-        // }
         href={resolve(channelHref)}
         class={cn(
             "group pl-2 py-2 pr-4 rounded-md flex items-center gap-x-2 w-full",
@@ -57,28 +55,31 @@
             {channel.channelName}
         </p>
         
-        <!-- {#if channel.channelName !== "general" && role !== "GUEST"}
+        {#if channel.channelName !== "general" && role !== "GUEST"}
             <div class="ml-auto flex items-center gap-x-2">
                 <ActionTooltip label="Edit" side="top">
                     <SquarePen 
                         onclick={(event) => {
+                            event.preventDefault();
                             event.stopPropagation();
                             isEditChannelDialogOpen = true;
                         }}
-                        class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"/>
+                        class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"
+                    />
                 </ActionTooltip>
                 
                 <ActionTooltip label="Delete" side="top">
                     <Trash 
                         onclick={(event) => {
+                            event.preventDefault();
                             event.stopPropagation();
                             isDeleteChannelDialogOpen = true;
                         }}
                         class="hidden group-hover:block size-4 text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 transition"
-                        />
+                    />
                 </ActionTooltip>
             </div>
-        {/if} -->
+        {/if}
 
         {#if channel.channelName === "general"}
             <Lock class="ml-auto size-4 text-zinc-500 dark:text-zinc-400"/>
@@ -86,6 +87,5 @@
     </a>
 </div>
 
-
-<!-- <DeleteChannel bind:isDeleteChannelDialogOpen {channel}/> -->
-<!-- <EditChannel bind:isEditChannelDialogOpen {channel}/> -->
+<EditChannel bind:isEditChannelDialogOpen {channel} serverMembers={members} />
+<DeleteChannel bind:isDeleteChannelDialogOpen {channel} />

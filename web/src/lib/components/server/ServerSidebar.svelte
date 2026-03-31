@@ -96,6 +96,7 @@
                     <ServerChannel 
                         {channel}
                         {role}
+                        members={currentServerMembersList}
                     />
                 {/each}
             </div>
@@ -114,6 +115,7 @@
                     <ServerChannel 
                         {channel}
                         {role}
+                        members={currentServerMembersList}
                     />
                 {/each}
             </div>
@@ -132,6 +134,7 @@
                     <ServerChannel 
                         {channel}
                         {role}
+                        members={currentServerMembersList}
                     />
                 {/each}
             </div>
